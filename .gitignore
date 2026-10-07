@@ -1,0 +1,24 @@
+# Segredos — NUNCA versionar
+.env
+.env.*
+!.env.example
+coach.dat
+*.key
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Arquivos temporários do projeto
+temp_voice_resp.mp3
+
+# Perfil pessoal (descomente se não quiser publicar o seu)
+# player_profile.json
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

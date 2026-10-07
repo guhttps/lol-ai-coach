@@ -1,0 +1,8 @@
+requests>=2.31
+python-dotenv>=1.0
+SpeechRecognition>=3.10
+keyboard>=0.13
+sounddevice>=0.4
+numpy>=1.26
+edge-tts>=6.1
+playsound3>=3.3.2
