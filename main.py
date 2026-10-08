@@ -97,6 +97,7 @@ def main():
                     token = _session_token(summary)
                     if token != last_game_token:
                         analyzer.reset()
+                        history.clear()
                         last_game_token = token
                         print(f"🎮 Partida detectada: {summary['eu']['campeao']}")
                     last_in_game = True

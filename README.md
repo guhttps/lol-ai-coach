@@ -18,7 +18,7 @@ Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a
 ## Requisitos
 
 - Windows 10/11
-- [Python 3.10+](https://www.python.org/downloads/) (marque **"Add Python to PATH"** na instalação)
+- [Python 3.11+](https://www.python.org/downloads/) (marque **"Add Python to PATH"** na instalação)
 - League of Legends instalado
 - Microfone e internet (IA, transcrição e voz usam serviços online)
 - Uma chave de API **gratuita** da Groq: https://console.groq.com/keys
@@ -27,7 +27,7 @@ Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a
 
 1. Baixe ou clone o repositório:
    ```powershell
-   git clone https://github.com/SEU_USUARIO/lol-ai-coach.git
+   git clone https://github.com/guhttps/lol-ai-coach.git
    cd lol-ai-coach
    ```
 2. Copie `.env.example` para `.env` e coloque a sua chave:
@@ -99,4 +99,3 @@ A Live Client Data API não fornece posição no mapa, cooldowns inimigos, visã
 ## Licença
 
 [MIT](LICENSE)
-
