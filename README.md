@@ -1,4 +1,4 @@
-﻿# LoL AI Coach v3.1 🎮🧠🗣️
+﻿# LoL AI Coach v3.1 
 
 Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a partida em tempo real, fala só quando tem algo útil a dizer e responde às suas perguntas por push-to-talk.
 
