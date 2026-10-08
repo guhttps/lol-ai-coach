@@ -1,4 +1,4 @@
-"""Cérebro do coach e integração com Groq."""
+"""Cérebro do coach e integração com APIs compatíveis com OpenAI."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import json
 import os
 import requests
 
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+DEFAULT_API_BASE_URL = "https://api.groq.com/openai/v1"
 
 REGRAS_GERAIS = (
     "REGRAS OBRIGATÓRIAS:\n"
@@ -48,20 +48,39 @@ CANDIDATE_MODELS = [
     "qwen/qwen3-32b",
 ]
 _working_model = None
+_working_api_base_url = None
 
 
-def _call_groq(model, messages, headers):
+def _call_api(api_base_url, model, messages, headers):
     payload = {"model": model, "max_tokens": 180, "temperature": 0.45, "messages": messages}
-    if model.startswith("openai/gpt-oss"):
-        payload["reasoning_effort"] = "low"
-    return requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=20)
+    return requests.post(
+        f"{api_base_url}/chat/completions",
+        headers=headers,
+        json=payload,
+        timeout=20,
+    )
 
 
 def ask_coach(user_text, game_summary, conversation_history, personality_id="1", trigger=None, profile=None):
-    global _working_model
-    api_key = os.environ.get("GROQ_API_KEY")
-    if not api_key:
-        raise RuntimeError("GROQ_API_KEY não encontrada no arquivo .env.")
+    global _working_api_base_url, _working_model
+    api_base_url = os.environ.get("LLM_BASE_URL", DEFAULT_API_BASE_URL).strip().rstrip("/")
+    if api_base_url.endswith("/chat/completions"):
+        api_base_url = api_base_url[: -len("/chat/completions")]
+    configured_model = os.environ.get("LLM_MODEL", "").strip()
+    is_default_groq = api_base_url == DEFAULT_API_BASE_URL
+    api_key = os.environ.get("LLM_API_KEY")
+    if not api_key and is_default_groq:
+        api_key = os.environ.get("GROQ_API_KEY")
+
+    if not api_base_url:
+        raise RuntimeError("LLM_BASE_URL não pode ficar vazio.")
+    if not api_key and is_default_groq:
+        raise RuntimeError("Configure LLM_API_KEY ou GROQ_API_KEY no arquivo .env.")
+    if not configured_model and not is_default_groq:
+        raise RuntimeError("Configure LLM_MODEL com o nome do modelo no arquivo .env.")
+    if api_base_url != _working_api_base_url:
+        _working_model = None
+        _working_api_base_url = api_base_url
 
     perfil = PERSONALIDADES.get(str(personality_id), PERSONALIDADES["1"])
     context = json.dumps(game_summary, ensure_ascii=False, separators=(",", ":")) if game_summary else "SEM_PARTIDA"
@@ -81,32 +100,43 @@ def ask_coach(user_text, game_summary, conversation_history, personality_id="1",
     )
     user_content = f"ESTADO ATUAL:\n{context}\n\nFALA DA JOGADORA:\n{user_text or '(nenhuma)'}"
     messages = [{"role": "system", "content": system}] + conversation_history[-10:] + [{"role": "user", "content": user_content}]
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    headers = {"Content-Type": "application/json"}
 
-    models = list(dict.fromkeys(([_working_model] if _working_model else []) + CANDIDATE_MODELS))
+    fallback_models = CANDIDATE_MODELS if is_default_groq and not configured_model else []
+    models = list(
+        dict.fromkeys(
+            ([_working_model] if _working_model and not configured_model else [])
+            + ([configured_model] if configured_model else [])
+            + fallback_models
+        )
+    )
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
     for model in models:
         try:
-            response = _call_groq(model, messages, headers)
+            response = _call_api(api_base_url, model, messages, headers)
         except requests.RequestException as exc:
-            raise RuntimeError("Não foi possível conectar à API da Groq. Verifique a internet e tente novamente.") from exc
+            raise RuntimeError("Não foi possível conectar à API configurada. Verifique a URL e a conexão.") from exc
         if response.status_code == 429:
-            raise RuntimeError("O limite da API do Groq foi atingido. Tente novamente mais tarde.")
+            raise RuntimeError("O limite da API configurada foi atingido. Tente novamente mais tarde.")
         if response.status_code in {401, 403}:
-            raise RuntimeError("A Groq recusou a chave de API. Confira GROQ_API_KEY no arquivo .env.")
+            raise RuntimeError("A API recusou a chave. Confira LLM_API_KEY (ou GROQ_API_KEY na Groq) no .env.")
         if response.ok:
             try:
                 text = response.json()["choices"][0]["message"]["content"].strip()
             except (KeyError, IndexError, TypeError, AttributeError, ValueError) as exc:
-                raise RuntimeError("A API da Groq retornou uma resposta em formato inesperado.") from exc
+                raise RuntimeError("A API configurada retornou uma resposta em formato inesperado.") from exc
             _working_model = model
             if text.upper() == "SILENCIO":
                 return ""
             return text
         if response.status_code == 404:
             _working_model = None
+            if configured_model:
+                break
             continue
         try:
             response.raise_for_status()
         except requests.HTTPError as exc:
-            raise RuntimeError(f"A API da Groq retornou erro HTTP {response.status_code}.") from exc
-    raise RuntimeError("Nenhum modelo configurado do Groq está disponível.")
+            raise RuntimeError(f"A API configurada retornou erro HTTP {response.status_code}.") from exc
+    raise RuntimeError("Nenhum modelo configurado está disponível na API.")

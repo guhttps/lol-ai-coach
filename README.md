@@ -12,7 +12,7 @@ Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a
 - **Memória curta** da conversa, para não repetir recomendações.
 - **Conversa contextual:** entende perguntas de acompanhamento usando o histórico recente, com respostas mais naturais e diretas em pt-BR.
 - **Conversa por voz sempre respondida:** perguntas diretas não são confundidas com dicas automáticas silenciosas quando não há evento relevante.
-- **IA em segundo plano:** o monitoramento da partida continua enquanto a Groq prepara a resposta; perguntas faladas têm prioridade sobre dicas automáticas ainda pendentes.
+- **IA em segundo plano:** o monitoramento da partida continua enquanto o provedor configurado prepara a resposta; perguntas faladas têm prioridade sobre dicas automáticas ainda pendentes.
 - **Voz neural** em pt-BR (Edge TTS), com fila, para a fala não travar o monitoramento.
 - **Overlay** sempre no topo com o estado da partida e a última dica.
 - **3 personalidades:** Debochado/Zueira, Analítico/Tryhard e Hype/Motivacional.
@@ -24,7 +24,7 @@ Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a
 - [Python 3.11+](https://www.python.org/downloads/) (marque **"Add Python to PATH"** na instalação)
 - League of Legends instalado
 - Microfone e internet (IA, transcrição e voz usam serviços online)
-- Uma chave de API **gratuita** da Groq: https://console.groq.com/keys
+- Uma chave de API de um provedor compatível com OpenAI Chat Completions. A configuração padrão usa Groq: https://console.groq.com/keys
 
 ## Instalação
 
@@ -35,12 +35,21 @@ Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a
    ```
 2. Copie `.env.example` para `.env` e coloque a sua chave:
    ```
-   GROQ_API_KEY=sua_chave_aqui
+   LLM_BASE_URL=https://api.groq.com/openai/v1
+   LLM_API_KEY=
+   LLM_MODEL=
+   GROQ_API_KEY=sua_chave_groq
    COACH_OVERLAY=true
    ```
-3. (Opcional) Edite `player_profile.json` com o seu nome, lane e campeões favoritos.
-4. Dê dois cliques em **`start_coach.bat`**. Na primeira vez ele cria o ambiente virtual e instala as dependências (leva alguns minutos).
-5. Escolha a personalidade, abra o LoL e entre em uma partida.
+3. Para usar outro provedor, altere `LLM_BASE_URL`, `LLM_API_KEY` e `LLM_MODEL` no `.env`. Exemplos de endpoints:
+   - OpenAI: `https://api.openai.com/v1`
+   - OpenRouter: `https://openrouter.ai/api/v1`
+   - Ollama local: `http://localhost:11434/v1` (normalmente sem chave)
+
+   Use o nome do modelo exatamente como o provedor o identifica. A API precisa aceitar OpenAI Chat Completions (`/chat/completions`). A transcrição de voz continua usando a Groq e `GROQ_API_KEY`; trocar o provedor das respostas não altera esse serviço.
+4. (Opcional) Edite `player_profile.json` com o seu nome, lane e campeões favoritos.
+5. Dê dois cliques em **`start_coach.bat`**. Na primeira vez ele cria o ambiente virtual e instala as dependências (leva alguns minutos).
+6. Escolha a personalidade, abra o LoL e entre em uma partida.
 
 Para instalar sem abrir o coach, use `INSTALAR_DEPENDENCIAS.bat`.
 
@@ -61,7 +70,7 @@ Dicas:
 
 | Onde | O que muda |
 |---|---|
-| `.env` | `GROQ_API_KEY` e `COACH_OVERLAY` |
+| `.env` | `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `GROQ_API_KEY` e `COACH_OVERLAY` |
 | `player_profile.json` | Nome, lane, campeões, nível, objetivo e tom |
 | `main.py` | Tecla de push-to-talk, intervalo de leitura (3 s), tamanho do histórico |
 | `coach_engine.py` | Limites e cooldowns de cada tipo de evento |
@@ -72,7 +81,7 @@ Dicas:
 
 ```
 main.py            loop principal (push-to-talk + monitoramento)
-brain.py           prompts, personalidades e chamadas à Groq
+brain.py           prompts, personalidades e chamadas à API de IA configurada
 coach_worker.py    processamento em segundo plano das respostas da IA
 coach_engine.py    detecção local de eventos e cooldowns
 live_client.py     leitura da Live Client Data API do LoL
@@ -93,7 +102,7 @@ python -m unittest discover -s tests -v
 
 O coach mantém o estado da partida por até 12 segundos sem resposta da API
 local, permitindo recuperar de interrupções breves sem reiniciar a análise.
-Falhas de conexão, respostas HTTP inválidas e erros de configuração da Groq
+Falhas de conexão, respostas HTTP inválidas e erros de configuração da API
 agora exibem mensagens específicas. Se o Data Dragon estiver indisponível,
 o coach usa o filtro reserva por nome e tenta carregar o catálogo novamente
 após 60 segundos.
@@ -107,7 +116,7 @@ A Live Client Data API não fornece posição no mapa, cooldowns inimigos, visã
 ## Privacidade e segurança
 
 - O arquivo `.env` com a sua chave **não deve ser enviado** ao GitHub (já está no `.gitignore`).
-- O áudio do microfone, enquanto você segura o botão, e o estado da sua partida são enviados à Groq. A voz do coach é gerada pelo serviço Edge TTS da Microsoft.
+- O áudio do microfone, enquanto você segura o botão, é enviado à Groq para transcrição. O estado da partida e as perguntas são enviados ao provedor definido em `LLM_BASE_URL`. A voz do coach é gerada pelo serviço Edge TTS da Microsoft.
 - Nenhum dado é guardado em servidor próprio. Tudo roda na sua máquina.
 
 ## Próximos passos possíveis
