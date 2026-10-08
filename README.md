@@ -109,6 +109,17 @@ após 60 segundos.
 As chamadas de IA agora são processadas em segundo plano, e o contexto da
 conversa é reiniciado ao trocar de partida para não misturar sessões.
 
+Melhorias de estabilidade:
+- Dicas automáticas pendentes usam o estado mais recente, evitando acumular orientações antigas enquanto a IA responde.
+- Partidas consecutivas com a mesma conta e campeão reiniciam o contexto quando o relógio da partida volta ao início.
+- Fechar o overlay interrompe sua fila de mensagens, sem encerrar o coach.
+- O `.env` e o perfil são procurados na pasta do código (ou junto ao executável), independentemente da pasta de onde o programa foi aberto. Perfis com JSON inválido usam os valores padrão.
+- A voz usa arquivos temporários exclusivos, evitando conflitos entre instâncias do coach.
+- Respostas da API local que não sejam objetos JSON são descartadas com diagnóstico.
+
+As alterações no código-fonte são usadas pelo `start_coach.bat`. Um executável
+já existente em `dist/` precisa ser recompilado para incluir essas alterações.
+
 ## Limitações
 
 A Live Client Data API não fornece posição no mapa, cooldowns inimigos, visão real nem intenção dos jogadores. O coach é instruído a **não inventar** o que não está nos dados e a responder `SILENCIO` quando não tem nada relevante a dizer.

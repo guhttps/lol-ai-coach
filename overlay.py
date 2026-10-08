@@ -24,12 +24,24 @@ class CoachOverlay:
         self.root.geometry("420x120+20+20")
         self.root.attributes("-topmost", True)
         self.root.resizable(False, False)
+        self.root.protocol("WM_DELETE_WINDOW", self._close)
         self.status = tk.Label(self.root, text="● Coach conectado", font=("Segoe UI", 9), anchor="w")
         self.status.pack(fill="x", padx=12, pady=(10, 2))
         self.label = tk.Label(self.root, text="Esperando uma partida...", font=("Segoe UI", 11), wraplength=390, justify="left", anchor="w")
         self.label.pack(fill="both", expand=True, padx=12, pady=(0, 10))
         self.root.after(200, self._poll)
         self.root.mainloop()
+
+    def _close(self):
+        self.enabled = False
+        while True:
+            try:
+                self.events.get_nowait()
+            except queue.Empty:
+                break
+        if self.root is not None:
+            self.root.destroy()
+            self.root = None
 
     def _poll(self):
         if not self.root:

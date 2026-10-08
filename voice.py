@@ -9,6 +9,7 @@ import wave
 import queue
 import re
 import threading
+import tempfile
 import requests
 import time
 
@@ -150,7 +151,8 @@ class Voice:
                 self._queue.task_done()
 
     async def _speak(self, text):
-        path = os.path.abspath("temp_voice_resp.mp3")
+        descriptor, path = tempfile.mkstemp(prefix="lol_coach_", suffix=".mp3")
+        os.close(descriptor)
         for voice in (PRIMARY_VOICE, FALLBACK_VOICE):
             try:
                 await edge_tts.Communicate(text, voice, rate=VOICE_RATE).save(path)

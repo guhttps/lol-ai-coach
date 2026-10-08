@@ -87,6 +87,17 @@ class LiveClientDiagnosticsTests(unittest.TestCase):
     def tearDown(self):
         live_client._last_api_issue = None
 
+    def test_non_object_json_is_rejected_and_logged_once(self):
+        for payload in ([], "invalid", None):
+            live_client._last_api_issue = None
+            response = unittest.mock.Mock()
+            response.json.return_value = payload
+            with patch("live_client.requests.get", return_value=response):
+                with self.assertLogs("live_client", level="WARNING") as logs:
+                    self.assertIsNone(live_client.get_game_data())
+                    self.assertIsNone(live_client.get_game_data())
+            self.assertEqual(len(logs.output), 1)
+
     def test_unavailable_connection_is_logged_once_until_recovery(self):
         with patch("live_client.requests.get", side_effect=requests.ConnectionError):
             with self.assertLogs("live_client", level="INFO") as logs:

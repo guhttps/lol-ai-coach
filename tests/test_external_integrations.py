@@ -203,6 +203,19 @@ class ItemDataTests(unittest.TestCase):
 
         get.assert_called_once()
 
+    def test_first_fetch_is_allowed_soon_after_system_start(self):
+        with patch("item_data.time.monotonic", return_value=5.0):
+            with patch("item_data.requests.get", side_effect=requests.Timeout) as get:
+                with self.assertLogs("item_data", level="WARNING"):
+                    self.assertIsNone(item_data.is_finished_item(3001))
+        get.assert_called_once()
+
+    def test_empty_loaded_catalog_does_not_enable_name_fallback(self):
+        with patch.object(item_data, "_finished_item_ids", set()):
+            with patch("item_data.requests.get") as get:
+                self.assertFalse(item_data.is_finished_item(3001))
+        get.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

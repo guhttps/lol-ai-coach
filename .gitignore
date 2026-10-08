@@ -10,6 +10,8 @@ venv/
 .venv/
 __pycache__/
 *.pyc
+build/
+dist/
 
 # Arquivos temporários do projeto
 temp_voice_resp.mp3

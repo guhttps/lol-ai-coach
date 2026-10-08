@@ -33,7 +33,7 @@ def _carregar_itens_finalizados():
         return _finished_item_ids
 
     now = time.monotonic()
-    if now - _last_load_attempt < _RETRY_INTERVAL_SECONDS:
+    if _last_load_attempt and now - _last_load_attempt < _RETRY_INTERVAL_SECONDS:
         return None
     _last_load_attempt = now
 
@@ -69,7 +69,6 @@ def _carregar_itens_finalizados():
             if not tem_upgrade and custo_total >= _GOLD_MINIMO:
                 finalizados.add(int(item_id))
         _finished_item_ids = finalizados
-        _finished_item_ids = finalizados
     except (requests.RequestException, KeyError, IndexError, TypeError, ValueError) as exc:
         details = str(exc).strip() or type(exc).__name__
         logger.warning("Não foi possível carregar os itens do Data Dragon: %s", details)
@@ -86,7 +85,7 @@ def is_finished_item(item_id):
     if item_id is None:
         return None
     ids = _carregar_itens_finalizados()
-    if not ids:
+    if ids is None:
         return None
     try:
         return int(item_id) in ids

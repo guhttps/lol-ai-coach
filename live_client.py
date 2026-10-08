@@ -57,6 +57,11 @@ def get_game_data() -> dict | None:
         response = requests.get(LIVE_CLIENT_URL, verify=False, timeout=2)
         response.raise_for_status()
         data = response.json()
+        if not isinstance(data, dict):
+            if _last_api_issue != "invalid_payload":
+                logger.warning("A Live Client API retornou dados em formato inesperado.")
+                _last_api_issue = "invalid_payload"
+            return None
     except (requests.ConnectionError, requests.Timeout):
         if _last_api_issue != "unavailable":
             logger.info("Live Client API indisponível; aguardando conexão com a partida.")

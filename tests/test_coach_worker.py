@@ -102,6 +102,17 @@ class CoachWorkerTests(unittest.TestCase):
 
         self.assertEqual(result.job.user_text, "nova partida")
 
+    def test_automatic_backlog_uses_latest_snapshot_after_chat(self):
+        with patch("coach_worker.ask_coach", return_value="Resposta") as ask:
+            self.worker.submit(CoachJob("automatic", "", {"time": 1}, trigger="antigo"))
+            self.worker.submit(CoachJob("chat", "pergunta", None))
+            self.worker.submit(CoachJob("automatic", "", {"time": 2}, trigger="atual"))
+            self.assertEqual(self._poll_until_result([]).job.kind, "chat")
+            result = self._poll_until_result([])
+            self.assertEqual(result.job.trigger, "atual")
+            self.assertEqual(ask.call_count, 2)
+            self.assertEqual(ask.call_args.args[1], {"time": 2})
+
 
 if __name__ == "__main__":
     unittest.main()

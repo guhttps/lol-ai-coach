@@ -13,12 +13,12 @@ from dotenv import load_dotenv
 from brain import PERSONALIDADES
 from coach_engine import ConnectionGracePeriod, GameAnalyzer
 from coach_worker import CoachJob, CoachWorker
-from config import load_profile
+from config import APP_DIR, load_profile
 from live_client import get_game_data, summarize_game_data
 from overlay import CoachOverlay
 from voice import Voice, listen_and_transcribe
 
-load_dotenv()
+load_dotenv(APP_DIR / ".env")
 
 PUSH_TO_TALK_KEY = "space"
 CHECK_INTERVAL_SECONDS = 3.0
@@ -52,6 +52,7 @@ def main():
     history = []
     last_check = 0.0
     last_game_token = None
+    last_game_time = None
     last_in_game = False
 
     print(f"🎙️ Segure [{PUSH_TO_TALK_KEY.upper()}] para falar.")
@@ -60,7 +61,7 @@ def main():
 
     while True:
         try:
-            now = time.time()
+            now = time.monotonic()
 
             result = coach_worker.poll(history, personality_id, profile)
             if result:
@@ -111,6 +112,8 @@ def main():
                             print("🏁 Partida encerrada ou cliente indisponível.")
                             last_in_game = False
                             last_game_token = None
+                            last_game_time = None
+                            history.clear()
                             analyzer.reset()
                             coach_worker.reset()
                             overlay.set_status("○ Fora da partida")
@@ -131,12 +134,14 @@ def main():
                 else:
                     connection_grace.update(True)
                     token = _session_token(summary)
-                    if token != last_game_token:
+                    game_time = summary["tempo_de_jogo_seg"]
+                    if token != last_game_token or (last_game_time is not None and game_time < last_game_time - 5):
                         analyzer.reset()
                         coach_worker.reset()
                         history.clear()
                         last_game_token = token
                         print(f"🎮 Partida detectada: {summary['eu']['campeao']}")
+                    last_game_time = game_time
                     last_in_game = True
                     overlay.set_status(f"● {summary['eu']['campeao']} · {summary['tempo_de_jogo_min']:.1f} min")
                     trigger = analyzer.analyze(summary)

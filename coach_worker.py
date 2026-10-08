@@ -36,6 +36,9 @@ class CoachWorker:
         self._current_generation = 0
 
     def submit(self, job: CoachJob) -> None:
+        if job.kind == "automatic":
+            # Only the latest game state is useful for a pending automatic tip.
+            self._pending = deque(queued for queued in self._pending if queued.kind != "automatic")
         self._pending.append(job)
         self._pending = deque(
             sorted(self._pending, key=lambda queued_job: queued_job.kind != "chat")
