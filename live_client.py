@@ -92,12 +92,10 @@ def summarize_game_data(data: dict | None) -> dict | None:
 
     active_name = _name(active_player)
     me_raw = next((p for p in all_players if _name(p) == active_name), None)
-    if me_raw is None and all_players:
-        me_raw = all_players[0]
 
     me = _player_entry(me_raw) if me_raw else None
-    # During loading/reconnect the API can expose gameData but temporarily omit
-    # allPlayers/active player. Keep the summary valid and let main.py wait.
+    # During loading/reconnect, do not mistake the first listed player for
+    # the local player when the active player has not been identified yet.
     if me is not None:
         me["gold_atual"] = round(float(active_player.get("currentGold", 0)))
     my_team = me.get("time") if me else None

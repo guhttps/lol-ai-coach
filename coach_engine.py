@@ -29,6 +29,7 @@ class GameAnalyzer:
     def __init__(self):
         self.previous = None
         self.last_fired: dict[str, float] = {}
+        self.pending_triggers: dict[str, Trigger] = {}
         self.seen_items: dict[str, set[str]] = {}
         self.last_event_ids: set[str] = set()
         self.game_token = None
@@ -37,6 +38,7 @@ class GameAnalyzer:
     def reset(self):
         self.previous = None
         self.last_fired.clear()
+        self.pending_triggers.clear()
         self.seen_items.clear()
         self.last_event_ids.clear()
         self.game_token = None
@@ -46,7 +48,6 @@ class GameAnalyzer:
         if not current or not current.get("eu"):
             return []
         now = time.time()
-        triggers: list[Trigger] = []
         me = current["eu"]
         prev = self.previous
 
@@ -57,10 +58,7 @@ class GameAnalyzer:
             return []
 
         def add(kind, priority, prompt, cooldown=45):
-            last = self.last_fired.get(kind, 0)
-            if now - last >= cooldown:
-                self.last_fired[kind] = now
-                triggers.append(Trigger(kind, priority, prompt, cooldown))
+            self.pending_triggers[kind] = Trigger(kind, priority, prompt, cooldown)
 
         hp = (me.get("vida_maxima") or 0)
         hp_pct = (me.get("vida", 0) / hp) if hp else 1
@@ -119,20 +117,38 @@ class GameAnalyzer:
                     30,
                 )
 
-        # A IA recebe no máximo o gatilho mais relevante por ciclo.
-        triggers.sort(key=lambda t: t.priority, reverse=True)
         self._remember(current)
 
-        top = triggers[0] if triggers else None
-        if top is None:
-            return []
+        # Não deixe uma dica de vida baixa/renascimento ser falada depois que
+        # a situação que a motivou já mudou.
+        if hp_pct > 0.25 or me.get("morto_agora"):
+            self.pending_triggers.pop("low_health", None)
+        if me.get("morto_agora"):
+            self.pending_triggers.pop("respawn", None)
 
-        # Respeita o cooldown global, exceto para eventos críticos (morte).
-        if top.priority < CRITICAL_PRIORITY and (now - self.last_any_trigger) < GLOBAL_COOLDOWN_SECONDS:
-            return []
+        # Mantenha os gatilhos não selecionados enquanto o cooldown global
+        # bloqueia a fala; eventos de um único ciclo não devem ser perdidos.
+        candidates = sorted(
+            self.pending_triggers.values(),
+            key=lambda trigger: trigger.priority,
+            reverse=True,
+        )
+        for trigger in candidates:
+            last_fired = self.last_fired.get(trigger.kind)
+            if last_fired is not None and now - last_fired < trigger.cooldown:
+                continue
+            if (
+                trigger.priority < CRITICAL_PRIORITY
+                and now - self.last_any_trigger < GLOBAL_COOLDOWN_SECONDS
+            ):
+                continue
 
-        self.last_any_trigger = now
-        return [top]
+            self.pending_triggers.pop(trigger.kind, None)
+            self.last_fired[trigger.kind] = now
+            self.last_any_trigger = now
+            return [trigger]
+
+        return []
 
     def _remember(self, current):
         # Cópia rasa suficiente para os campos usados nas comparações.

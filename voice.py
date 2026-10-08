@@ -129,7 +129,10 @@ class Voice:
         if priority:
             while not self._queue.empty():
                 try: self._queue.get_nowait()
-                except queue.Empty: break
+                except queue.Empty:
+                    break
+                else:
+                    self._queue.task_done()
         try:
             self._queue.put_nowait(text)
         except queue.Full:

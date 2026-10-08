@@ -78,6 +78,14 @@ overlay.py         janela sempre no topo (Tkinter)
 config.py          carregamento do perfil
 ```
 
+## Testes
+
+Execute os testes do motor de eventos com:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
 ## Limitações
 
 A Live Client Data API não fornece posição no mapa, cooldowns inimigos, visão real nem intenção dos jogadores. O coach é instruído a **não inventar** o que não está nos dados e a responder `SILENCIO` quando não tem nada relevante a dizer.
