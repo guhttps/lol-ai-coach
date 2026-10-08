@@ -80,8 +80,8 @@ config.py          carregamento do perfil
 
 ## Testes
 
-Execute os testes do motor de eventos, da tolerância a desconexões e da
-normalização dos dados do cliente com:
+Execute os testes do motor de eventos, das integrações simuladas com Groq e
+Data Dragon, da tolerância a desconexões e dos dados do cliente com:
 
 ```powershell
 python -m unittest discover -s tests -v
@@ -89,6 +89,10 @@ python -m unittest discover -s tests -v
 
 O coach mantém o estado da partida por até 12 segundos sem resposta da API
 local, permitindo recuperar de interrupções breves sem reiniciar a análise.
+Falhas de conexão, respostas HTTP inválidas e erros de configuração da Groq
+agora exibem mensagens específicas. Se o Data Dragon estiver indisponível,
+o coach usa o filtro reserva por nome e tenta carregar o catálogo novamente
+após 60 segundos.
 
 ## Limitações
 

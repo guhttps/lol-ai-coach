@@ -69,19 +69,30 @@ def ask_coach(user_text, game_summary, conversation_history, personality_id="1",
     messages = [{"role": "system", "content": system}] + conversation_history[-10:] + [{"role": "user", "content": user_content}]
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
-    models = [_working_model] if _working_model else CANDIDATE_MODELS
+    models = list(dict.fromkeys(([_working_model] if _working_model else []) + CANDIDATE_MODELS))
     for model in models:
-        response = _call_groq(model, messages, headers)
+        try:
+            response = _call_groq(model, messages, headers)
+        except requests.RequestException as exc:
+            raise RuntimeError("Não foi possível conectar à API da Groq. Verifique a internet e tente novamente.") from exc
         if response.status_code == 429:
             raise RuntimeError("O limite da API do Groq foi atingido. Tente novamente mais tarde.")
+        if response.status_code in {401, 403}:
+            raise RuntimeError("A Groq recusou a chave de API. Confira GROQ_API_KEY no arquivo .env.")
         if response.ok:
+            try:
+                text = response.json()["choices"][0]["message"]["content"].strip()
+            except (KeyError, IndexError, TypeError, AttributeError, ValueError) as exc:
+                raise RuntimeError("A API da Groq retornou uma resposta em formato inesperado.") from exc
             _working_model = model
-            text = response.json()["choices"][0]["message"]["content"].strip()
             if text.upper() == "SILENCIO":
                 return ""
             return text
         if response.status_code == 404:
             _working_model = None
             continue
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as exc:
+            raise RuntimeError(f"A API da Groq retornou erro HTTP {response.status_code}.") from exc
     raise RuntimeError("Nenhum modelo configurado do Groq está disponível.")

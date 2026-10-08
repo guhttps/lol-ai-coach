@@ -1,7 +1,10 @@
 import unittest
 from unittest.mock import patch
 
+import requests
+
 from live_client import summarize_game_data
+import live_client
 
 
 def player(name, champion, team):
@@ -78,6 +81,41 @@ class SummarizeGameDataTests(unittest.TestCase):
         self.assertIsNone(summary["eu"])
         self.assertEqual(summary["tempo_de_jogo_seg"], 0)
         self.assertEqual(summary["eventos_recentes"], [])
+
+
+class LiveClientDiagnosticsTests(unittest.TestCase):
+    def tearDown(self):
+        live_client._last_api_issue = None
+
+    def test_unavailable_connection_is_logged_once_until_recovery(self):
+        with patch("live_client.requests.get", side_effect=requests.ConnectionError):
+            with self.assertLogs("live_client", level="INFO") as logs:
+                self.assertIsNone(live_client.get_game_data())
+                self.assertIsNone(live_client.get_game_data())
+
+        self.assertEqual(len(logs.output), 1)
+        self.assertIn("indisponível", logs.output[0])
+
+        response = unittest.mock.Mock()
+        response.json.return_value = {"gameData": {}}
+        with patch("live_client.requests.get", return_value=response):
+            with self.assertLogs("live_client", level="INFO") as recovery_logs:
+                self.assertEqual(live_client.get_game_data(), {"gameData": {}})
+
+        self.assertIn("restabelecida", recovery_logs.output[0])
+
+    def test_http_failure_is_reported_and_not_repeated(self):
+        response = unittest.mock.Mock()
+        response.status_code = 503
+        response.raise_for_status.side_effect = requests.HTTPError(response=response)
+
+        with patch("live_client.requests.get", return_value=response):
+            with self.assertLogs("live_client", level="WARNING") as logs:
+                self.assertIsNone(live_client.get_game_data())
+                self.assertIsNone(live_client.get_game_data())
+
+        self.assertEqual(len(logs.output), 1)
+        self.assertIn("503", logs.output[0])
 
 
 if __name__ == "__main__":

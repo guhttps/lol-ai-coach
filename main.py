@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
 import time
@@ -38,6 +39,7 @@ def _session_token(summary):
 
 
 def main():
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     print("=== LoL AI Coach v3.1 ===")
     personality_id = escolher_personalidade()
     profile = load_profile()

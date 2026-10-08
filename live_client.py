@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 import requests
 import urllib3
 
@@ -9,7 +11,9 @@ from item_data import is_finished_item
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+logger = logging.getLogger(__name__)
 LIVE_CLIENT_URL = "https://127.0.0.1:2999/liveclientdata/allgamedata"
+_last_api_issue = None
 
 IGNORED_WORDS = [
     "ward", "sentinel", "totem", "lente", "potion", "poção", "poca",
@@ -48,12 +52,37 @@ def eh_item_relevante(item: dict) -> bool:
 
 
 def get_game_data() -> dict | None:
+    global _last_api_issue
     try:
         response = requests.get(LIVE_CLIENT_URL, verify=False, timeout=2)
         response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException:
+        data = response.json()
+    except (requests.ConnectionError, requests.Timeout):
+        if _last_api_issue != "unavailable":
+            logger.info("Live Client API indisponível; aguardando conexão com a partida.")
+            _last_api_issue = "unavailable"
         return None
+    except requests.HTTPError as exc:
+        issue = f"http:{exc.response.status_code if exc.response is not None else 'unknown'}"
+        if _last_api_issue != issue:
+            logger.warning("A Live Client API respondeu com erro HTTP (%s).", issue.partition(":")[2])
+            _last_api_issue = issue
+        return None
+    except requests.exceptions.JSONDecodeError:
+        if _last_api_issue != "invalid_json":
+            logger.warning("A Live Client API retornou uma resposta JSON inválida.")
+            _last_api_issue = "invalid_json"
+        return None
+    except requests.RequestException as exc:
+        issue = type(exc).__name__
+        if _last_api_issue != issue:
+            logger.warning("Falha ao consultar a Live Client API (%s).", issue)
+            _last_api_issue = issue
+        return None
+    if _last_api_issue is not None:
+        logger.info("Conexão com a Live Client API restabelecida.")
+        _last_api_issue = None
+    return data
 
 
 def _player_entry(player: dict) -> dict:
