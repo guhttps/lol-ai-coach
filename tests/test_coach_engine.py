@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from coach_engine import GameAnalyzer
+from coach_engine import ConnectionGracePeriod, GameAnalyzer
 
 
 def game_state(*, kills=0, level=1, health=100, dead=False, events=None):
@@ -73,6 +73,23 @@ class GameAnalyzerTests(unittest.TestCase):
             triggers = analyzer.analyze(game_state(health=80, kills=1))
 
         self.assertNotIn("low_health", [trigger.kind for trigger in triggers])
+
+
+class ConnectionGracePeriodTests(unittest.TestCase):
+    def test_short_disconnect_does_not_expire_and_recovery_resets_timer(self):
+        grace_period = ConnectionGracePeriod(grace_seconds=12)
+
+        self.assertFalse(grace_period.update(False, now=100))
+        self.assertFalse(grace_period.update(False, now=111))
+        self.assertFalse(grace_period.update(True, now=112))
+        self.assertFalse(grace_period.update(False, now=120))
+
+    def test_disconnect_expires_after_grace_period(self):
+        grace_period = ConnectionGracePeriod(grace_seconds=12)
+
+        self.assertFalse(grace_period.update(False, now=100))
+        self.assertFalse(grace_period.update(False, now=111.9))
+        self.assertTrue(grace_period.update(False, now=112))
 
 
 if __name__ == "__main__":

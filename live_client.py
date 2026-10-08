@@ -61,7 +61,7 @@ def _player_entry(player: dict) -> dict:
     stats = player.get("championStats", {}) or {}
     items = [
         item.get("displayName")
-        for item in player.get("items", [])
+        for item in player.get("items", []) or []
         if item.get("displayName") and eh_item_relevante(item)
     ]
     return {
@@ -86,9 +86,9 @@ def summarize_game_data(data: dict | None) -> dict | None:
         return None
 
     all_players = data.get("allPlayers", []) or []
-    active_player = data.get("activePlayer", {}) or {}
-    game_data = data.get("gameData", {}) or {}
-    events = data.get("events", {}).get("Events", []) or []
+    active_player = data.get("activePlayer") or {}
+    game_data = data.get("gameData") or {}
+    events = (data.get("events") or {}).get("Events", []) or []
 
     active_name = _name(active_player)
     me_raw = next((p for p in all_players if _name(p) == active_name), None)
@@ -97,13 +97,14 @@ def summarize_game_data(data: dict | None) -> dict | None:
     # During loading/reconnect, do not mistake the first listed player for
     # the local player when the active player has not been identified yet.
     if me is not None:
-        me["gold_atual"] = round(float(active_player.get("currentGold", 0)))
+        me["gold_atual"] = round(float(active_player.get("currentGold", 0) or 0))
     my_team = me.get("time") if me else None
 
+    game_time = float(game_data.get("gameTime", 0) or 0)
     summary = {
-        "tempo_de_jogo_seg": round(float(game_data.get("gameTime", 0))),
-        "tempo_de_jogo_min": round(float(game_data.get("gameTime", 0)) / 60, 1),
-        "fase": _game_phase(float(game_data.get("gameTime", 0))),
+        "tempo_de_jogo_seg": round(game_time),
+        "tempo_de_jogo_min": round(game_time / 60, 1),
+        "fase": _game_phase(game_time),
         "eu": me,
         "aliados": [],
         "inimigos": [],
@@ -116,10 +117,11 @@ def summarize_game_data(data: dict | None) -> dict | None:
         entry = _player_entry(player)
         if me and entry["nome"] == me["nome"]:
             continue
-        if my_team and entry["time"] == my_team:
-            summary["aliados"].append(entry)
-        else:
-            summary["inimigos"].append(entry)
+        if my_team:
+            if entry["time"] == my_team:
+                summary["aliados"].append(entry)
+            else:
+                summary["inimigos"].append(entry)
 
     # Preserva os últimos eventos com os campos úteis para heurísticas.
     for event in events[-12:]:

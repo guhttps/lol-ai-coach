@@ -10,7 +10,7 @@ import keyboard
 from dotenv import load_dotenv
 
 from brain import PERSONALIDADES, ask_coach
-from coach_engine import GameAnalyzer
+from coach_engine import ConnectionGracePeriod, GameAnalyzer
 from config import load_profile
 from live_client import get_game_data, summarize_game_data
 from overlay import CoachOverlay
@@ -44,6 +44,7 @@ def main():
     overlay = CoachOverlay(enabled=os.getenv("COACH_OVERLAY", "true").lower() not in {"0", "false", "no"})
     voice = Voice()
     analyzer = GameAnalyzer()
+    connection_grace = ConnectionGracePeriod()
     history = []
     last_check = 0.0
     last_game_token = None
@@ -80,12 +81,19 @@ def main():
 
                 if not summary:
                     if last_in_game:
-                        print("🏁 Partida encerrada ou cliente indisponível.")
-                    last_in_game = False
-                    last_game_token = None
-                    analyzer.reset()
-                    overlay.set_status("○ Fora da partida")
+                        if connection_grace.update(False):
+                            print("🏁 Partida encerrada ou cliente indisponível.")
+                            last_in_game = False
+                            last_game_token = None
+                            analyzer.reset()
+                            overlay.set_status("○ Fora da partida")
+                        else:
+                            overlay.set_status("● Conexão interrompida · reconectando")
+                    else:
+                        connection_grace.update(False)
+                        overlay.set_status("○ Fora da partida")
                 elif not summary.get("eu"):
+                    connection_grace.update(True)
                     # A Live Client API can briefly return gameData/events without
                     # a resolved active player (especially while loading/reconnecting).
                     # Do not let the overlay/coach crash during that window.
@@ -94,6 +102,7 @@ def main():
                     time.sleep(0.05)
                     continue
                 else:
+                    connection_grace.update(True)
                     token = _session_token(summary)
                     if token != last_game_token:
                         analyzer.reset()

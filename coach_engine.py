@@ -14,6 +14,23 @@ class Trigger:
     cooldown: float = 45.0
 
 
+class ConnectionGracePeriod:
+    """Evita encerrar a sessão por uma falha breve na API local."""
+
+    def __init__(self, grace_seconds: float = 12.0):
+        self.grace_seconds = grace_seconds
+        self.unavailable_since = None
+
+    def update(self, available: bool, now: float | None = None) -> bool:
+        now = time.monotonic() if now is None else now
+        if available:
+            self.unavailable_since = None
+            return False
+        if self.unavailable_since is None:
+            self.unavailable_since = now
+        return now - self.unavailable_since >= self.grace_seconds
+
+
 # Intervalo mínimo entre duas falas automáticas, mesmo de tipos diferentes.
 # Sem isso, vários tipos de evento (level_up, respawn, item:X de cada
 # inimigo...) podem disparar em sequência rápida e soar repetitivo, mesmo
