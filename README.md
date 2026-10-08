@@ -11,6 +11,7 @@ Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a
 - **Economia de IA:** regras locais (`coach_engine.py`) detectam os eventos primeiro, e a IA só é chamada para transformar o evento em uma frase. Há cooldown por tipo de evento e um cooldown global, para o coach não falar demais.
 - **Memória curta** da conversa, para não repetir recomendações.
 - **Conversa contextual:** entende perguntas de acompanhamento usando o histórico recente, com respostas mais naturais e diretas em pt-BR.
+- **Conversa por voz sempre respondida:** perguntas diretas não são confundidas com dicas automáticas silenciosas quando não há evento relevante.
 - **IA em segundo plano:** o monitoramento da partida continua enquanto a Groq prepara a resposta; perguntas faladas têm prioridade sobre dicas automáticas ainda pendentes.
 - **Voz neural** em pt-BR (Edge TTS), com fila, para a fala não travar o monitoramento.
 - **Overlay** sempre no topo com o estado da partida e a última dica.

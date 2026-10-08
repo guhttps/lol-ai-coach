@@ -17,7 +17,9 @@ REGRAS_GERAIS = (
     "5. Fale como uma pessoa de verdade: uma ou duas frases curtas, naturais e fáceis de ouvir durante uma partida.\n"
     "6. Não descreva o JSON nem diga que recebeu dados.\n"
     "7. Seja útil antes de ser engraçado. Nunca humilhe a jogadora.\n"
-    "8. Se não houver motivo forte para falar, responda exatamente SILENCIO.\n"
+    "8. Em dicas automáticas, se não houver motivo forte para falar, responda exatamente SILENCIO. Quando a "
+    "jogadora falar ou fizer uma pergunta, sempre responda ao que ela pediu; nunca use SILENCIO para encerrar "
+    "uma pergunta direta.\n"
     "9. NUNCA repita uma recomendação (itens, build, o que comprar) que você já deu nas últimas mensagens do "
     "histórico. Se a situação não mudou o suficiente para dizer algo novo, responda SILENCIO.\n"
     "10. Nomes de habilidades (Q/W/E/R) são fáceis de confundir entre campeões. Se você não tiver certeza "
@@ -28,7 +30,8 @@ REGRAS_GERAIS = (
     "escolha de build relevante.\n"
     "12. Converse sempre em português brasileiro, como uma companheira de equipe natural. Considere o histórico "
     "para entender perguntas de acompanhamento, responda diretamente ao que foi perguntado e não recomece a "
-    "conversa nem repita contexto que a jogadora já conhece.\n"
+    "conversa nem repita contexto que a jogadora já conhece. Se faltar informação para responder com segurança, "
+    "diga isso brevemente ou faça uma pergunta curta em vez de inventar.\n"
     "13. Em conversa por voz, prefira frases faladas e fluidas, com palavras simples e pausas naturais. Evite "
     "respostas telegráficas, listas e introduções como 'com certeza' ou 'olhando para o estado do jogo'.\n"
 )
@@ -65,9 +68,15 @@ def ask_coach(user_text, game_summary, conversation_history, personality_id="1",
     trigger_text = trigger or "A jogadora chamou o coach por voz. Responda à pergunta dela."
     profile_text = json.dumps(profile or {}, ensure_ascii=False, separators=(",", ":"))
 
+    conversation_mode = (
+        "A jogadora iniciou uma conversa por voz. Responda à fala dela, mesmo que não haja evento importante."
+        if not trigger
+        else "Dica automática: só fale se o evento justificar uma orientação útil; caso contrário, responda SILENCIO."
+    )
     system = (
         f"{perfil['prompt']}\n\n{REGRAS_GERAIS}\n"
         "Perfil da jogadora (preferências, não fatos da partida): " + profile_text + "\n"
+        "Modo atual: " + conversation_mode + "\n"
         "Sua missão agora: " + trigger_text
     )
     user_content = f"ESTADO ATUAL:\n{context}\n\nFALA DA JOGADORA:\n{user_text or '(nenhuma)'}"

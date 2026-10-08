@@ -67,6 +67,26 @@ class GroqIntegrationTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "formato inesperado"):
                 self._ask()
 
+    def test_voice_question_prompt_prioritizes_answering_and_dialogue_context(self):
+        response = self._response(200)
+        with patch("brain._call_groq", return_value=response) as call:
+            self._ask()
+
+        system_prompt = call.call_args.args[1][0]["content"]
+        self.assertIn("sempre responda ao que ela pediu", system_prompt)
+        self.assertIn("perguntas de acompanhamento", system_prompt)
+        self.assertIn("iniciou uma conversa por voz", system_prompt)
+
+    def test_automatic_prompt_allows_silence_when_no_advice_is_useful(self):
+        response = self._response(200)
+        with patch("brain._call_groq", return_value=response) as call:
+            with patch.dict("os.environ", {"GROQ_API_KEY": "test-key"}):
+                brain.ask_coach("", None, [], trigger="evento de teste")
+
+        system_prompt = call.call_args.args[1][0]["content"]
+        self.assertIn("Dica automática", system_prompt)
+        self.assertIn("responda SILENCIO", system_prompt)
+
 
 class ItemDataTests(unittest.TestCase):
     def setUp(self):
