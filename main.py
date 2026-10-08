@@ -10,8 +10,9 @@ import time
 import keyboard
 from dotenv import load_dotenv
 
-from brain import PERSONALIDADES, ask_coach
+from brain import PERSONALIDADES
 from coach_engine import ConnectionGracePeriod, GameAnalyzer
+from coach_worker import CoachJob, CoachWorker
 from config import load_profile
 from live_client import get_game_data, summarize_game_data
 from overlay import CoachOverlay
@@ -46,6 +47,7 @@ def main():
     overlay = CoachOverlay(enabled=os.getenv("COACH_OVERLAY", "true").lower() not in {"0", "false", "no"})
     voice = Voice()
     analyzer = GameAnalyzer()
+    coach_worker = CoachWorker()
     connection_grace = ConnectionGracePeriod()
     history = []
     last_check = 0.0
@@ -60,20 +62,42 @@ def main():
         try:
             now = time.time()
 
+            result = coach_worker.poll(history, personality_id, profile)
+            if result:
+                job = result.job
+                if result.error:
+                    if job.kind == "chat":
+                        print(f"⚠️ IA: {result.error}")
+                    else:
+                        print(f"⚠️ IA automática: {result.error}")
+                else:
+                    reply = result.reply or ""
+                    if job.kind == "chat":
+                        history.extend([
+                            {"role": "user", "content": job.user_text},
+                            {"role": "assistant", "content": reply},
+                        ])
+                    else:
+                        history.extend([
+                            {"role": "user", "content": f"[evento automático: {job.event_kind}]"},
+                            {"role": "assistant", "content": reply},
+                        ])
+                    history[:] = history[-MAX_HISTORY_MESSAGES:]
+                    if reply:
+                        overlay.show_tip(reply)
+                        voice.speak(reply, priority=job.priority)
+
             if keyboard.is_pressed(PUSH_TO_TALK_KEY):
                 text = listen_and_transcribe(PUSH_TO_TALK_KEY)
                 if text:
                     print(f"👤 Ela: {text}")
                     summary = summarize_game_data(get_game_data())
-                    try:
-                        reply = ask_coach(text, summary, history, personality_id, profile=profile)
-                        history += [{"role": "user", "content": text}, {"role": "assistant", "content": reply}]
-                        history = history[-MAX_HISTORY_MESSAGES:]
-                        if reply:
-                            overlay.show_tip(reply)
-                            voice.speak(reply, priority=True)
-                    except Exception as exc:
-                        print(f"⚠️ IA: {exc}")
+                    coach_worker.submit(CoachJob(
+                        kind="chat",
+                        user_text=text,
+                        game_summary=summary,
+                        priority=True,
+                    ))
                 time.sleep(0.4)
 
             if now - last_check >= CHECK_INTERVAL_SECONDS:
@@ -88,6 +112,7 @@ def main():
                             last_in_game = False
                             last_game_token = None
                             analyzer.reset()
+                            coach_worker.reset()
                             overlay.set_status("○ Fora da partida")
                         else:
                             overlay.set_status("● Conexão interrompida · reconectando")
@@ -108,6 +133,7 @@ def main():
                     token = _session_token(summary)
                     if token != last_game_token:
                         analyzer.reset()
+                        coach_worker.reset()
                         history.clear()
                         last_game_token = token
                         print(f"🎮 Partida detectada: {summary['eu']['campeao']}")
@@ -117,22 +143,19 @@ def main():
                     if trigger:
                         event = trigger[0]
                         print(f"💡 {event.kind}")
-                        try:
-                            reply = ask_coach("", summary, history, personality_id, trigger=event.prompt, profile=profile)
-                            if reply:
-                                # registra o evento E a resposta, não só a resposta, pra o
-                                # modelo enxergar claramente o que já foi comentado antes
-                                history.append({"role": "user", "content": f"[evento automático: {event.kind}]"})
-                                history.append({"role": "assistant", "content": reply})
-                                history = history[-MAX_HISTORY_MESSAGES:]
-                                overlay.show_tip(reply)
-                                voice.speak(reply, priority=event.priority >= 90)
-                        except Exception as exc:
-                            print(f"⚠️ IA automática: {exc}")
+                        coach_worker.submit(CoachJob(
+                            kind="automatic",
+                            user_text="",
+                            game_summary=summary,
+                            trigger=event.prompt,
+                            event_kind=event.kind,
+                            priority=event.priority >= 90,
+                        ))
 
             time.sleep(0.05)
         except KeyboardInterrupt:
             print("\nEncerrando o LoL AI Coach. Boa partida!")
+            coach_worker.shutdown()
             sys.exit(0)
 
 

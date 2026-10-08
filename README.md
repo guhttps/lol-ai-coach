@@ -10,6 +10,8 @@ Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a
 - **Coach proativo:** detecta vida baixa, morte, renascimento, subida de nível, abates, ouro acumulado, pico de CS, itens novos dos inimigos e objetivos (dragão, barão, arauto, torres e inibidores).
 - **Economia de IA:** regras locais (`coach_engine.py`) detectam os eventos primeiro, e a IA só é chamada para transformar o evento em uma frase. Há cooldown por tipo de evento e um cooldown global, para o coach não falar demais.
 - **Memória curta** da conversa, para não repetir recomendações.
+- **Conversa contextual:** entende perguntas de acompanhamento usando o histórico recente, com respostas mais naturais e diretas em pt-BR.
+- **IA em segundo plano:** o monitoramento da partida continua enquanto a Groq prepara a resposta; perguntas faladas têm prioridade sobre dicas automáticas ainda pendentes.
 - **Voz neural** em pt-BR (Edge TTS), com fila, para a fala não travar o monitoramento.
 - **Overlay** sempre no topo com o estado da partida e a última dica.
 - **3 personalidades:** Debochado/Zueira, Analítico/Tryhard e Hype/Motivacional.
@@ -70,6 +72,7 @@ Dicas:
 ```
 main.py            loop principal (push-to-talk + monitoramento)
 brain.py           prompts, personalidades e chamadas à Groq
+coach_worker.py    processamento em segundo plano das respostas da IA
 coach_engine.py    detecção local de eventos e cooldowns
 live_client.py     leitura da Live Client Data API do LoL
 item_data.py       identificação de itens finalizados
@@ -93,6 +96,8 @@ Falhas de conexão, respostas HTTP inválidas e erros de configuração da Groq
 agora exibem mensagens específicas. Se o Data Dragon estiver indisponível,
 o coach usa o filtro reserva por nome e tenta carregar o catálogo novamente
 após 60 segundos.
+As chamadas de IA agora são processadas em segundo plano, e o contexto da
+conversa é reiniciado ao trocar de partida para não misturar sessões.
 
 ## Limitações
 
