@@ -13,24 +13,26 @@ from dotenv import load_dotenv
 from brain import PERSONALIDADES
 from coach_engine import ConnectionGracePeriod, GameAnalyzer
 from coach_worker import CoachJob, CoachWorker
-from config import APP_DIR, load_profile
+from config import APP_DIR, get_runtime_settings, load_profile
 from live_client import get_game_data, summarize_game_data
 from overlay import CoachOverlay
 from voice import Voice, listen_and_transcribe
 
 load_dotenv(APP_DIR / ".env")
 
-PUSH_TO_TALK_KEY = "space"
-CHECK_INTERVAL_SECONDS = 3.0
-MAX_HISTORY_MESSAGES = 12
+RUNTIME_SETTINGS = get_runtime_settings()
+PUSH_TO_TALK_KEY = RUNTIME_SETTINGS["push_to_talk_key"]
+CHECK_INTERVAL_SECONDS = RUNTIME_SETTINGS["check_interval_seconds"]
+MAX_HISTORY_MESSAGES = RUNTIME_SETTINGS["max_history_messages"]
 
 
 def escolher_personalidade():
+    default_personality = RUNTIME_SETTINGS["default_personality"]
     print("\n=== Personalidade do Coach ===")
     for key, info in PERSONALIDADES.items():
         print(f"{key} - {info['nome']}")
-    opcao = input("Escolha [1]: ").strip() or "1"
-    return opcao if opcao in PERSONALIDADES else "1"
+    opcao = input(f"Escolha [{default_personality}]: ").strip() or default_personality
+    return opcao if opcao in PERSONALIDADES else default_personality
 
 
 def _session_token(summary):
@@ -44,7 +46,7 @@ def main():
     print("=== LoL AI Coach v3.1 ===")
     personality_id = escolher_personalidade()
     profile = load_profile()
-    overlay = CoachOverlay(enabled=os.getenv("COACH_OVERLAY", "true").lower() not in {"0", "false", "no"})
+    overlay = CoachOverlay(enabled=RUNTIME_SETTINGS["overlay_enabled"])
     voice = Voice()
     analyzer = GameAnalyzer()
     coach_worker = CoachWorker()

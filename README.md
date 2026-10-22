@@ -70,9 +70,9 @@ Dicas:
 
 | Onde | O que muda |
 |---|---|
-| `.env` | `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `GROQ_API_KEY` e `COACH_OVERLAY` |
+| `.env` | `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `GROQ_API_KEY`, `COACH_OVERLAY`, `PUSH_TO_TALK_KEY`, `CHECK_INTERVAL_SECONDS`, `MAX_HISTORY_MESSAGES` e `COACH_PERSONALITY` |
 | `player_profile.json` | Nome, lane, campeões, nível, objetivo e tom |
-| `main.py` | Tecla de push-to-talk, intervalo de leitura (3 s), tamanho do histórico |
+| `main.py` | Ajustes de runtime e loop principal |
 | `coach_engine.py` | Limites e cooldowns de cada tipo de evento |
 | `brain.py` | Regras do prompt, personalidades e modelos |
 | `voice.py` | Voz e velocidade da fala |
