@@ -1,0 +1,19 @@
+LoL AI Coach - como usar o executável
+=====================================
+
+1. Faça uma cópia do arquivo .env.example e renomeie a cópia para .env
+   (no Explorador de Arquivos, ative Exibir > Mostrar > Extensões de nomes de arquivos).
+2. Abra o .env no Bloco de Notas e cole sua chave em GROQ_API_KEY.
+   Chave gratuita: https://console.groq.com/keys
+3. (Opcional) Edite player_profile.json com seu nome, lane e campeões favoritos.
+4. Abra LoL_AI_Coach.exe, escolha a personalidade e entre em uma partida.
+5. Segure ESPAÇO para falar com o coach.
+
+Se aparecer "O Windows protegeu o computador", clique em "Mais informações" e
+depois em "Executar assim mesmo". O executável não tem assinatura digital, e o
+código-fonte completo está em https://github.com/guhttps/lol-ai-coach
+
+Se o push-to-talk não responder, abra o LoL_AI_Coach.exe como administrador.
+
+Documentação completa e solução de problemas:
+https://github.com/guhttps/lol-ai-coach#readme
