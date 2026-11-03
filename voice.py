@@ -5,17 +5,17 @@ from __future__ import annotations
 import asyncio
 import io
 import os
-import wave
 import queue
 import re
-import threading
 import tempfile
-import requests
+import threading
 import time
+import wave
 
 import edge_tts
 import keyboard
 import numpy as np
+import requests
 import sounddevice as sd
 import speech_recognition as sr
 from playsound3 import playsound
@@ -129,7 +129,8 @@ class Voice:
             return
         if priority:
             while not self._queue.empty():
-                try: self._queue.get_nowait()
+                try:
+                    self._queue.get_nowait()
                 except queue.Empty:
                     break
                 else:
@@ -162,6 +163,7 @@ class Voice:
                 print(f"⚠️ Falha com {voice}: {exc}")
             finally:
                 try:
-                    if os.path.exists(path): os.remove(path)
+                    if os.path.exists(path):
+                        os.remove(path)
                 except OSError:
                     pass

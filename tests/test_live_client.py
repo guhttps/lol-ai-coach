@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 import requests
 
-from live_client import summarize_game_data
 import live_client
+from live_client import summarize_game_data
 
 
 def player(name, champion, team):

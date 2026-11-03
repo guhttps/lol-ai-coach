@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ========================================
-echo       LoL AI Coach v3.1 - Inicializador
+echo         LoL AI Coach - Inicializador
 echo ========================================
 echo.
 

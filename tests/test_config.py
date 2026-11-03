@@ -13,7 +13,7 @@ class ProfileTests(unittest.TestCase):
         with patch("config.os.path.exists", return_value=True):
             with patch("builtins.open", mock_open(read_data='{"nome": "Jogadora"}')) as opened:
                 self.assertEqual(load_profile()["nome"], "Jogadora")
-        opened.assert_called_once_with(APP_DIR / "player_profile.json", "r", encoding="utf-8")
+        opened.assert_called_once_with(APP_DIR / "player_profile.json", encoding="utf-8")
 
     def test_invalid_profile_formats_fall_back_to_defaults(self):
         with tempfile.TemporaryDirectory() as directory:

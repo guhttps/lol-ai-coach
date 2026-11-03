@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import time
 from dataclasses import dataclass
 
@@ -168,8 +169,7 @@ class GameAnalyzer:
         return []
 
     def _remember(self, current):
-        # Cópia rasa suficiente para os campos usados nas comparações.
-        import copy
+        # Cópia profunda: o resumo da próxima leitura não pode alterar a base de comparação.
         self.previous = copy.deepcopy(current)
 
     def _remember_items(self, current):
