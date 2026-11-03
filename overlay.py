@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import ctypes
 import queue
+import sys
 import threading
 import tkinter as tk
 
@@ -12,6 +14,7 @@ STATUS_ONLINE = "#5ad08a"
 STATUS_WAITING = "#f2b84b"
 STATUS_OFFLINE = "#8a91a3"
 WINDOW_ALPHA = 0.93
+DWMWA_USE_IMMERSIVE_DARK_MODE = 20
 
 
 def status_color(text: str) -> str:
@@ -21,6 +24,20 @@ def status_color(text: str) -> str:
     if "reconectando" in text or "aguardando" in text:
         return STATUS_WAITING
     return STATUS_ONLINE
+
+
+def _use_dark_title_bar(root):
+    """Barra de título escura no Windows 10 (20H1+) e 11; ignorada nos demais."""
+    if sys.platform != "win32":
+        return
+    try:
+        hwnd = ctypes.windll.user32.GetParent(root.winfo_id())
+        enabled = ctypes.c_int(1)
+        ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ctypes.byref(enabled), ctypes.sizeof(enabled)
+        )
+    except (AttributeError, OSError):
+        pass
 
 
 class CoachOverlay:
@@ -54,6 +71,12 @@ class CoachOverlay:
             justify="left", anchor="nw", bg=BACKGROUND, fg=TIP_COLOR,
         )
         self.label.pack(fill="both", expand=True, padx=12, pady=(2, 10))
+        # A janela precisa existir para receber o atributo; esconder e mostrar
+        # de novo faz o Windows redesenhar a barra de título já escura.
+        self.root.withdraw()
+        self.root.update_idletasks()
+        _use_dark_title_bar(self.root)
+        self.root.deiconify()
         self.root.after(200, self._poll)
         self.root.mainloop()
 
