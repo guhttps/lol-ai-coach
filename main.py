@@ -40,6 +40,15 @@ def _session_token(summary):
     return f"{summary.get('mapa')}:{summary['eu'].get('nome')}:{summary['eu'].get('campeao')}"
 
 
+def _configure_console():
+    # Com a saída redirecionada (ex.: "> log.txt"), o Windows usa cp1252 e os
+    # emojis dos logs derrubariam o coach. UTF-8 funciona no console e em arquivo,
+    # e o buffer por linha mantém o log atualizado durante a partida.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+
+
 def main():
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     print(f"=== LoL AI Coach v{APP_VERSION} ===")
@@ -166,4 +175,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _configure_console()
     main()
