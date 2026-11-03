@@ -52,8 +52,28 @@ _working_model = None
 _working_api_base_url = None
 
 
-def _call_api(api_base_url, model, messages, headers):
-    payload = {"model": model, "max_tokens": 180, "temperature": 0.45, "messages": messages}
+TIP_MAX_TOKENS = 180
+# A análise pós-partida é mais longa que uma dica, e alguns modelos gastam
+# parte dos tokens raciocinando antes de responder.
+REVIEW_MAX_TOKENS = 600
+
+REGRAS_ANALISE = (
+    "Você está revisando uma partida que acabou de terminar, a partir do resumo enviado.\n"
+    "REGRAS OBRIGATÓRIAS:\n"
+    "1. Use somente fatos presentes no resumo. Não invente posições no mapa, matchups, cooldowns nem intenções.\n"
+    "2. Escreva exatamente 2 pontos fortes e 2 pontos a treinar.\n"
+    "3. Cada ponto é uma frase curta em português do Brasil: cite um dado do resumo e diga o que fazer na "
+    "próxima partida.\n"
+    "4. Comece cada ponto forte com '+ ' e cada ponto a treinar com '- ', um por linha. Não escreva mais nada: "
+    "sem títulos, Markdown ou emojis.\n"
+    "5. Seja honesto e gentil. Nunca humilhe quem jogou.\n"
+    "6. Se o resumo indicar que a partida foi acompanhada só em parte, não tire conclusões sobre o trecho que "
+    "ficou de fora.\n"
+)
+
+
+def _call_api(api_base_url, model, messages, headers, max_tokens=TIP_MAX_TOKENS):
+    payload = {"model": model, "max_tokens": max_tokens, "temperature": 0.45, "messages": messages}
     return requests.post(
         f"{api_base_url}/chat/completions",
         headers=headers,
@@ -62,7 +82,8 @@ def _call_api(api_base_url, model, messages, headers):
     )
 
 
-def ask_coach(user_text, game_summary, conversation_history, personality_id="1", trigger=None, profile=None):
+def _complete(messages, max_tokens=TIP_MAX_TOKENS):
+    """Envia a conversa ao provedor configurado no .env e devolve o texto da resposta."""
     global _working_api_base_url, _working_model
     api_base_url = os.environ.get("LLM_BASE_URL", DEFAULT_API_BASE_URL).strip().rstrip("/")
     if api_base_url.endswith("/chat/completions"):
@@ -83,6 +104,47 @@ def ask_coach(user_text, game_summary, conversation_history, personality_id="1",
         _working_model = None
         _working_api_base_url = api_base_url
 
+    headers = {"Content-Type": "application/json"}
+
+    fallback_models = CANDIDATE_MODELS if is_default_groq and not configured_model else []
+    models = list(
+        dict.fromkeys(
+            ([_working_model] if _working_model and not configured_model else [])
+            + ([configured_model] if configured_model else [])
+            + fallback_models
+        )
+    )
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    for model in models:
+        try:
+            response = _call_api(api_base_url, model, messages, headers, max_tokens=max_tokens)
+        except requests.RequestException as exc:
+            raise RuntimeError("Não foi possível conectar à API configurada. Verifique a URL e a conexão.") from exc
+        if response.status_code == 429:
+            raise RuntimeError("O limite da API configurada foi atingido. Tente novamente mais tarde.")
+        if response.status_code in {401, 403}:
+            raise RuntimeError("A API recusou a chave. Confira LLM_API_KEY (ou GROQ_API_KEY na Groq) no .env.")
+        if response.ok:
+            try:
+                text = response.json()["choices"][0]["message"]["content"].strip()
+            except (KeyError, IndexError, TypeError, AttributeError, ValueError) as exc:
+                raise RuntimeError("A API configurada retornou uma resposta em formato inesperado.") from exc
+            _working_model = model
+            return text
+        if response.status_code == 404:
+            _working_model = None
+            if configured_model:
+                break
+            continue
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as exc:
+            raise RuntimeError(f"A API configurada retornou erro HTTP {response.status_code}.") from exc
+    raise RuntimeError("Nenhum modelo configurado está disponível na API.")
+
+
+def ask_coach(user_text, game_summary, conversation_history, personality_id="1", trigger=None, profile=None):
     perfil = PERSONALIDADES.get(str(personality_id), PERSONALIDADES["1"])
     context = json.dumps(game_summary, ensure_ascii=False, separators=(",", ":")) if game_summary else "SEM_PARTIDA"
     trigger_text = trigger or "A jogadora chamou o coach por voz. Responda à pergunta dela."
@@ -101,43 +163,43 @@ def ask_coach(user_text, game_summary, conversation_history, personality_id="1",
     )
     user_content = f"ESTADO ATUAL:\n{context}\n\nFALA DA JOGADORA:\n{user_text or '(nenhuma)'}"
     messages = [{"role": "system", "content": system}] + conversation_history[-10:] + [{"role": "user", "content": user_content}]
-    headers = {"Content-Type": "application/json"}
+    text = _complete(messages)
+    if text.upper() == "SILENCIO":
+        return ""
+    return text
 
-    fallback_models = CANDIDATE_MODELS if is_default_groq and not configured_model else []
-    models = list(
-        dict.fromkeys(
-            ([_working_model] if _working_model and not configured_model else [])
-            + ([configured_model] if configured_model else [])
-            + fallback_models
-        )
-    )
-    if api_key:
-        headers["Authorization"] = f"Bearer {api_key}"
-    for model in models:
-        try:
-            response = _call_api(api_base_url, model, messages, headers)
-        except requests.RequestException as exc:
-            raise RuntimeError("Não foi possível conectar à API configurada. Verifique a URL e a conexão.") from exc
-        if response.status_code == 429:
-            raise RuntimeError("O limite da API configurada foi atingido. Tente novamente mais tarde.")
-        if response.status_code in {401, 403}:
-            raise RuntimeError("A API recusou a chave. Confira LLM_API_KEY (ou GROQ_API_KEY na Groq) no .env.")
-        if response.ok:
-            try:
-                text = response.json()["choices"][0]["message"]["content"].strip()
-            except (KeyError, IndexError, TypeError, AttributeError, ValueError) as exc:
-                raise RuntimeError("A API configurada retornou uma resposta em formato inesperado.") from exc
-            _working_model = model
-            if text.upper() == "SILENCIO":
-                return ""
-            return text
-        if response.status_code == 404:
-            _working_model = None
-            if configured_model:
-                break
+
+def parse_review(text):
+    """Separa as linhas '+' (pontos fortes) e '-' (pontos a treinar) da resposta da IA."""
+    strengths, to_train = [], []
+    for line in (text or "").splitlines():
+        line = line.strip()
+        if line[:1] == "+":
+            target = strengths
+        elif line[:1] in {"-", "–", "—"}:
+            target = to_train
+        else:
             continue
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as exc:
-            raise RuntimeError(f"A API configurada retornou erro HTTP {response.status_code}.") from exc
-    raise RuntimeError("Nenhum modelo configurado está disponível na API.")
+        point = line[1:].strip()
+        if point:
+            target.append(point)
+    return {"fortes": strengths[:2], "treinar": to_train[:2]}
+
+
+def ask_post_match_review(match_summary, personality_id="1", profile=None):
+    """Pede à IA 2 pontos fortes e 2 pontos a treinar sobre a partida que terminou."""
+    perfil = PERSONALIDADES.get(str(personality_id), PERSONALIDADES["1"])
+    profile_text = json.dumps(profile or {}, ensure_ascii=False, separators=(",", ":"))
+    system = (
+        f"{perfil['prompt']}\n\n{REGRAS_ANALISE}\n"
+        "Perfil de quem jogou (preferências, não fatos da partida): " + profile_text
+    )
+    user_content = "RESUMO DA PARTIDA:\n" + json.dumps(match_summary, ensure_ascii=False, separators=(",", ":"))
+    text = _complete(
+        [{"role": "system", "content": system}, {"role": "user", "content": user_content}],
+        max_tokens=REVIEW_MAX_TOKENS,
+    )
+    review = parse_review(text)
+    if not review["fortes"] and not review["treinar"]:
+        raise RuntimeError("A IA respondeu a análise da partida em um formato inesperado.")
+    return review
