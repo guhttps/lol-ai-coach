@@ -29,6 +29,7 @@ Coach de League of Legends **por voz**, em português do Brasil. Ele acompanha a
 - 💸 **Economia de IA:** regras locais detectam os eventos primeiro, e a IA só é chamada para transformar o evento em uma frase. Cooldowns por tipo de evento e um cooldown global evitam que o coach fale demais.
 - 💬 **Conversa de verdade:** entende perguntas de acompanhamento pelo histórico recente, nunca ignora uma pergunta direta e não repete recomendações.
 - ⚡ **Sem travar:** a IA responde em segundo plano enquanto o monitoramento continua, e perguntas faladas passam na frente das dicas automáticas.
+- 📊 **Resumo pós-partida:** ao fim de cada partida, uma página com KDA, CS, ouro, linha do tempo, tudo o que o coach falou e uma análise com pontos fortes e pontos a treinar.
 - 🗣️ **Voz neural** em pt-BR (Edge TTS), com fila própria.
 - 🎭 **3 personalidades:** Debochado/Zueira, Analítico/Tryhard e Hype/Motivacional.
 - 🔌 **Qualquer IA compatível com OpenAI:** Groq (padrão), OpenAI, OpenRouter ou um modelo local no Ollama.
@@ -65,6 +66,7 @@ Cole sua chave em `GROQ_API_KEY`, salve e dê dois cliques em **`start_coach.bat
 2. Abra o LoL e entre em uma partida. O coach detecta sozinho quando ela começa e quando termina.
 3. Jogue normalmente. Ele fala quando acontece algo relevante.
 4. Para perguntar algo, segure `ESPAÇO`, fale e solte.
+5. Quando a partida termina, o [resumo pós-partida](#resumo-pós-partida) abre no navegador.
 
 | Ação | Como |
 |---|---|
@@ -76,7 +78,7 @@ Cole sua chave em `GROQ_API_KEY`, salve e dê dois cliques em **`start_coach.bat
 <summary><b>Exemplo de sessão no terminal</b></summary>
 
 ```text
-=== LoL AI Coach v3.2.0 ===
+=== LoL AI Coach v3.3.0 ===
 
 === Personalidade do Coach ===
 1 - Debochado / Zueira
@@ -95,6 +97,8 @@ INFO: Conexão com a Live Client API restabelecida.
 🎙️ Ouvindo... solte a tecla quando terminar.
 👤 Ela: vale a pena ir no dragão agora?
 🗣️ Coach: Vale, mas empurra a wave do mid primeiro. Com 1.900 de ouro, passa na base e chega no rio junto com o jungle.
+🏁 Partida encerrada ou cliente indisponível.
+📊 Resumo da partida salvo em C:\Jogos\lol-ai-coach\partidas\2026-11-03_21-40_Ahri.html
 ```
 
 As falas do coach são geradas pela IA e mudam a cada partida.
@@ -103,6 +107,22 @@ As falas do coach são geradas pela IA e mudam a cada partida.
 **Dicas:**
 - Jogue em modo **janela** ou **janela sem bordas**. Em tela cheia exclusiva o overlay pode não aparecer.
 - A tecla `ESPAÇO` também digita no chat do jogo se ele estiver aberto. Troque a tecla com `PUSH_TO_TALK_KEY` no `.env`.
+
+## Resumo pós-partida
+
+Quando a partida termina, o coach salva uma página com o resumo e abre no navegador:
+
+<p align="center">
+  <img src="docs/post-match.png" alt="Resumo pós-partida com resultado, números, análise do coach, gráficos de CS e ouro e linha do tempo" width="760"><br>
+  <sub>Resumo de exemplo, gerado numa partida simulada com dados fictícios.</sub>
+</p>
+
+- **Números da partida:** K/D/A, participação em abates, CS por minuto e aos 10 minutos, nível, placar de visão, itens finais e quanto tempo você ficou com 1.800 de ouro ou mais sem gastar.
+- **Análise do coach:** 2 pontos fortes e 2 pontos a treinar, escritos pela IA a partir dos números, no tom da personalidade escolhida.
+- **Gráficos** de CS e de ouro ao longo da partida, com as mortes marcadas.
+- **Linha do tempo** com abates, mortes (e quem matou), itens, níveis, objetivos e tudo o que o coach falou, inclusive as suas perguntas.
+
+Os resumos ficam na pasta `partidas`, ao lado do `main.py` ou do executável, em um `.html` que abre em qualquer navegador e um `.json` com os mesmos dados. Partidas acompanhadas por menos de 3 minutos não geram resumo. Se você fechar o coach com `Ctrl+C` no meio da partida, ele salva um resumo parcial, sem a análise da IA. Para desligar o resumo ou só a abertura automática, use `POST_MATCH_REPORT` e `POST_MATCH_OPEN` no `.env`.
 
 ## Configuração
 
@@ -119,6 +139,8 @@ Todas as opções ficam no `.env`, ao lado do `main.py` ou do executável:
 | `COACH_OVERLAY` | `true` | Mostra ou esconde o overlay. |
 | `CHECK_INTERVAL_SECONDS` | `3.0` | Intervalo entre leituras da partida (mínimo `0.5`). |
 | `MAX_HISTORY_MESSAGES` | `12` | Quantas mensagens recentes da conversa ficam na memória. |
+| `POST_MATCH_REPORT` | `true` | Salva o [resumo pós-partida](#resumo-pós-partida) ao fim de cada partida. |
+| `POST_MATCH_OPEN` | `true` | Abre o resumo no navegador assim que ele fica pronto. |
 
 Ajustes mais finos ficam no código:
 
@@ -126,8 +148,9 @@ Ajustes mais finos ficam no código:
 |---|---|
 | `player_profile.json` | Seu nome, lane, campeões favoritos, nível, objetivo e tom |
 | `coach_engine.py` | Limites e cooldowns de cada tipo de evento |
-| `brain.py` | Regras do prompt e personalidades |
+| `brain.py` | Regras do prompt, personalidades e regras da análise pós-partida |
 | `voice.py` | Voz, velocidade da fala e dicionário de termos |
+| `post_match_report.py` | Visual e textos do resumo pós-partida |
 
 ### Usar outro provedor de IA
 
@@ -153,6 +176,9 @@ flowchart LR
     W --> B["brain.py<br/>prompt + IA"]
     B --> TTS["voice.py<br/>voz neural"]
     B --> OV["overlay.py"]
+    LC --> MR["match_recorder.py<br/>registra a partida"]
+    B -->|falas do coach| MR
+    MR -->|fim da partida| PR["post_match_report.py<br/>página do resumo<br/>+ análise da IA"]
 ```
 
 O coach lê o estado da partida, compara com a leitura anterior e só chama a IA quando um evento passa pelos filtros locais. Assim ele gasta poucas requisições e não interrompe você à toa. Se a IA decidir que não há nada útil a dizer em uma dica automática, ela responde `SILENCIO` e o coach fica quieto.
@@ -167,6 +193,8 @@ O coach lê o estado da partida, compara com a leitura anterior e só chama a IA
 | `brain.py` | Prompts, personalidades e chamadas à API de IA |
 | `voice.py` | Transcrição (STT) e síntese de voz (TTS) |
 | `overlay.py` | Janela sempre no topo (Tkinter) |
+| `match_recorder.py` | Registro da partida para o resumo: amostras, eventos e falas |
+| `post_match_report.py` | Página do resumo pós-partida e análise final |
 | `config.py` | Versão, configurações do `.env` e perfil |
 
 ## Solução de problemas
@@ -207,6 +235,12 @@ O plano gratuito da Groq tem limite de requisições por minuto e por dia. Esper
 Jogue em modo janela ou janela sem bordas e confira se `COACH_OVERLAY=true` no `.env`. Se você fechou o overlay, ele só volta quando o coach for aberto de novo.
 </details>
 
+<details>
+<summary><b>O resumo da partida não apareceu</b></summary>
+
+O resumo é salvo 12 segundos depois que o jogo fecha, o tempo que o coach espera antes de considerar a partida encerrada. Partidas acompanhadas por menos de 3 minutos (um remake, por exemplo) não geram resumo. Confira também `POST_MATCH_REPORT` e `POST_MATCH_OPEN` no `.env`: com a abertura automática desligada, o arquivo continua na pasta `partidas`.
+</details>
+
 ## Limitações
 
 A Live Client Data API não fornece posição no mapa, cooldowns dos inimigos, visão real nem a intenção dos jogadores. O coach é instruído a **não inventar** o que não está nos dados.
@@ -216,6 +250,7 @@ A Live Client Data API não fornece posição no mapa, cooldowns dos inimigos, v
 - O `.env` com a sua chave está no `.gitignore` e **não deve ser publicado**.
 - Enquanto você segura a tecla, o áudio do microfone é enviado à Groq (ou ao Google, na reserva) para transcrição.
 - O estado da partida e as perguntas vão para o provedor definido em `LLM_BASE_URL`. A voz do coach é gerada pelo Edge TTS, da Microsoft.
+- Os resumos pós-partida ficam só no seu PC, na pasta `partidas` (que está no `.gitignore`). Para a análise final, o provedor de IA recebe um resumo numérico da partida e a linha do tempo, sem as suas perguntas.
 - Não existe servidor próprio: nada é guardado fora da sua máquina além do que os provedores acima recebem.
 
 ## Desenvolvimento
@@ -233,7 +268,7 @@ Os testes simulam a Live Client API, a Groq e o Data Dragon, e rodam no CI a cad
 
 - [ ] Integração opcional com a Riot API (histórico e matchups)
 - [ ] Detecção de lane/role
-- [ ] Resumo pós-partida com pontos fortes e pontos a treinar
+- [ ] Histórico das partidas, comparando os resumos ao longo do tempo
 - [ ] Configuração gráfica de personalidade, frequência e volume
 - [ ] Comandos de voz como "fica quieta" e "fala mais"
 

@@ -8,6 +8,8 @@ LoL AI Coach - como usar o executável
 3. (Opcional) Edite player_profile.json com seu nome, lane e campeões favoritos.
 4. Abra LoL_AI_Coach.exe, escolha a personalidade e entre em uma partida.
 5. Segure ESPAÇO para falar com o coach.
+6. Quando a partida termina, o resumo abre no navegador. Os resumos ficam
+   na pasta "partidas", ao lado do executável.
 
 Se aparecer "O Windows protegeu o computador", clique em "Mais informações" e
 depois em "Executar assim mesmo". O executável não tem assinatura digital, e o
