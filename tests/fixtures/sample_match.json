@@ -1,0 +1,1101 @@
+{
+  "versao_app": "3.3.0",
+  "inicio": "2026-11-03T21:40:00",
+  "fim": "2026-11-03T22:09:00",
+  "campeao": "Ahri",
+  "modo": "CLASSIC",
+  "mapa": "Map11",
+  "personalidade": "Analítico / Tryhard",
+  "resultado": "vitoria",
+  "parcial": false,
+  "inicio_seg": 0,
+  "fim_seg": 1694,
+  "amostras": [
+    {
+      "t": 0,
+      "nivel": 1,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 0,
+      "ouro": 50,
+      "morto": false
+    },
+    {
+      "t": 20,
+      "nivel": 1,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 0,
+      "ouro": 50,
+      "morto": false
+    },
+    {
+      "t": 41,
+      "nivel": 1,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 0,
+      "ouro": 50,
+      "morto": false
+    },
+    {
+      "t": 61,
+      "nivel": 1,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 0,
+      "ouro": 50,
+      "morto": false
+    },
+    {
+      "t": 81,
+      "nivel": 1,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 0,
+      "ouro": 88,
+      "morto": false
+    },
+    {
+      "t": 102,
+      "nivel": 2,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 2,
+      "ouro": 193,
+      "morto": false
+    },
+    {
+      "t": 122,
+      "nivel": 2,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 5,
+      "ouro": 293,
+      "morto": false
+    },
+    {
+      "t": 143,
+      "nivel": 2,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 8,
+      "ouro": 393,
+      "morto": false
+    },
+    {
+      "t": 163,
+      "nivel": 2,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 11,
+      "ouro": 498,
+      "morto": false
+    },
+    {
+      "t": 184,
+      "nivel": 3,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 0,
+      "cs": 13,
+      "ouro": 599,
+      "morto": false
+    },
+    {
+      "t": 205,
+      "nivel": 3,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 16,
+      "ouro": 854,
+      "morto": false
+    },
+    {
+      "t": 225,
+      "nivel": 3,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 19,
+      "ouro": 954,
+      "morto": false
+    },
+    {
+      "t": 245,
+      "nivel": 4,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 22,
+      "ouro": 1059,
+      "morto": false
+    },
+    {
+      "t": 266,
+      "nivel": 4,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 25,
+      "ouro": 1164,
+      "morto": false
+    },
+    {
+      "t": 286,
+      "nivel": 4,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 27,
+      "ouro": 1265,
+      "morto": false
+    },
+    {
+      "t": 307,
+      "nivel": 4,
+      "kills": 0,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 30,
+      "ouro": 165,
+      "morto": false
+    },
+    {
+      "t": 328,
+      "nivel": 5,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 33,
+      "ouro": 570,
+      "morto": false
+    },
+    {
+      "t": 348,
+      "nivel": 5,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 36,
+      "ouro": 675,
+      "morto": false
+    },
+    {
+      "t": 369,
+      "nivel": 5,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 38,
+      "ouro": 776,
+      "morto": false
+    },
+    {
+      "t": 389,
+      "nivel": 5,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 41,
+      "ouro": 881,
+      "morto": false
+    },
+    {
+      "t": 410,
+      "nivel": 6,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 44,
+      "ouro": 981,
+      "morto": false
+    },
+    {
+      "t": 430,
+      "nivel": 6,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 47,
+      "ouro": 1086,
+      "morto": false
+    },
+    {
+      "t": 451,
+      "nivel": 6,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 49,
+      "ouro": 1186,
+      "morto": false
+    },
+    {
+      "t": 471,
+      "nivel": 6,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 52,
+      "ouro": 1292,
+      "morto": false
+    },
+    {
+      "t": 492,
+      "nivel": 7,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 55,
+      "ouro": 1392,
+      "morto": false
+    },
+    {
+      "t": 512,
+      "nivel": 7,
+      "kills": 1,
+      "deaths": 0,
+      "assists": 1,
+      "cs": 58,
+      "ouro": 1497,
+      "morto": false
+    },
+    {
+      "t": 533,
+      "nivel": 7,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 1,
+      "cs": 59,
+      "ouro": 1559,
+      "morto": true
+    },
+    {
+      "t": 553,
+      "nivel": 7,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 1,
+      "cs": 60,
+      "ouro": 1632,
+      "morto": false
+    },
+    {
+      "t": 573,
+      "nivel": 8,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 1,
+      "cs": 63,
+      "ouro": 87,
+      "morto": false
+    },
+    {
+      "t": 594,
+      "nivel": 8,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 1,
+      "cs": 66,
+      "ouro": 187,
+      "morto": false
+    },
+    {
+      "t": 615,
+      "nivel": 8,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 1,
+      "cs": 69,
+      "ouro": 293,
+      "morto": false
+    },
+    {
+      "t": 635,
+      "nivel": 8,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 1,
+      "cs": 71,
+      "ouro": 393,
+      "morto": false
+    },
+    {
+      "t": 655,
+      "nivel": 9,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 74,
+      "ouro": 648,
+      "morto": false
+    },
+    {
+      "t": 676,
+      "nivel": 9,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 77,
+      "ouro": 748,
+      "morto": false
+    },
+    {
+      "t": 696,
+      "nivel": 9,
+      "kills": 1,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 80,
+      "ouro": 853,
+      "morto": false
+    },
+    {
+      "t": 717,
+      "nivel": 9,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 82,
+      "ouro": 154,
+      "morto": false
+    },
+    {
+      "t": 738,
+      "nivel": 9,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 85,
+      "ouro": 259,
+      "morto": false
+    },
+    {
+      "t": 758,
+      "nivel": 10,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 88,
+      "ouro": 364,
+      "morto": false
+    },
+    {
+      "t": 779,
+      "nivel": 10,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 100,
+      "ouro": 662,
+      "morto": false
+    },
+    {
+      "t": 800,
+      "nivel": 10,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 103,
+      "ouro": 767,
+      "morto": false
+    },
+    {
+      "t": 820,
+      "nivel": 10,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 105,
+      "ouro": 473,
+      "morto": false
+    },
+    {
+      "t": 841,
+      "nivel": 11,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 108,
+      "ouro": 573,
+      "morto": false
+    },
+    {
+      "t": 861,
+      "nivel": 11,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 111,
+      "ouro": 678,
+      "morto": false
+    },
+    {
+      "t": 882,
+      "nivel": 11,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 114,
+      "ouro": 778,
+      "morto": false
+    },
+    {
+      "t": 902,
+      "nivel": 11,
+      "kills": 2,
+      "deaths": 1,
+      "assists": 2,
+      "cs": 116,
+      "ouro": 879,
+      "morto": false
+    },
+    {
+      "t": 922,
+      "nivel": 11,
+      "kills": 2,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 117,
+      "ouro": 930,
+      "morto": true
+    },
+    {
+      "t": 943,
+      "nivel": 11,
+      "kills": 2,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 118,
+      "ouro": 989,
+      "morto": false
+    },
+    {
+      "t": 963,
+      "nivel": 12,
+      "kills": 2,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 120,
+      "ouro": 1094,
+      "morto": false
+    },
+    {
+      "t": 984,
+      "nivel": 12,
+      "kills": 2,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 123,
+      "ouro": 1194,
+      "morto": false
+    },
+    {
+      "t": 1004,
+      "nivel": 12,
+      "kills": 2,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 126,
+      "ouro": 94,
+      "morto": false
+    },
+    {
+      "t": 1024,
+      "nivel": 12,
+      "kills": 2,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 129,
+      "ouro": 200,
+      "morto": false
+    },
+    {
+      "t": 1045,
+      "nivel": 12,
+      "kills": 2,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 131,
+      "ouro": 300,
+      "morto": false
+    },
+    {
+      "t": 1065,
+      "nivel": 13,
+      "kills": 2,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 134,
+      "ouro": 405,
+      "morto": false
+    },
+    {
+      "t": 1086,
+      "nivel": 13,
+      "kills": 3,
+      "deaths": 2,
+      "assists": 2,
+      "cs": 137,
+      "ouro": 805,
+      "morto": false
+    },
+    {
+      "t": 1106,
+      "nivel": 13,
+      "kills": 3,
+      "deaths": 2,
+      "assists": 3,
+      "cs": 140,
+      "ouro": 1061,
+      "morto": false
+    },
+    {
+      "t": 1127,
+      "nivel": 13,
+      "kills": 3,
+      "deaths": 2,
+      "assists": 3,
+      "cs": 142,
+      "ouro": 1161,
+      "morto": false
+    },
+    {
+      "t": 1147,
+      "nivel": 13,
+      "kills": 3,
+      "deaths": 2,
+      "assists": 3,
+      "cs": 145,
+      "ouro": 1266,
+      "morto": false
+    },
+    {
+      "t": 1168,
+      "nivel": 13,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 3,
+      "cs": 148,
+      "ouro": 66,
+      "morto": false
+    },
+    {
+      "t": 1189,
+      "nivel": 14,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 4,
+      "cs": 151,
+      "ouro": 321,
+      "morto": false
+    },
+    {
+      "t": 1209,
+      "nivel": 14,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 4,
+      "cs": 154,
+      "ouro": 677,
+      "morto": false
+    },
+    {
+      "t": 1229,
+      "nivel": 14,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 4,
+      "cs": 156,
+      "ouro": 777,
+      "morto": false
+    },
+    {
+      "t": 1250,
+      "nivel": 14,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 4,
+      "cs": 169,
+      "ouro": 1097,
+      "morto": false
+    },
+    {
+      "t": 1271,
+      "nivel": 14,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 5,
+      "cs": 172,
+      "ouro": 152,
+      "morto": false
+    },
+    {
+      "t": 1291,
+      "nivel": 14,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 5,
+      "cs": 175,
+      "ouro": 557,
+      "morto": false
+    },
+    {
+      "t": 1312,
+      "nivel": 15,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 5,
+      "cs": 177,
+      "ouro": 658,
+      "morto": false
+    },
+    {
+      "t": 1332,
+      "nivel": 15,
+      "kills": 4,
+      "deaths": 2,
+      "assists": 5,
+      "cs": 180,
+      "ouro": 763,
+      "morto": false
+    },
+    {
+      "t": 1353,
+      "nivel": 15,
+      "kills": 4,
+      "deaths": 3,
+      "assists": 5,
+      "cs": 181,
+      "ouro": 824,
+      "morto": true
+    },
+    {
+      "t": 1373,
+      "nivel": 15,
+      "kills": 4,
+      "deaths": 3,
+      "assists": 5,
+      "cs": 181,
+      "ouro": 867,
+      "morto": true
+    },
+    {
+      "t": 1394,
+      "nivel": 15,
+      "kills": 4,
+      "deaths": 3,
+      "assists": 5,
+      "cs": 183,
+      "ouro": 944,
+      "morto": false
+    },
+    {
+      "t": 1414,
+      "nivel": 15,
+      "kills": 4,
+      "deaths": 3,
+      "assists": 5,
+      "cs": 186,
+      "ouro": 1049,
+      "morto": false
+    },
+    {
+      "t": 1435,
+      "nivel": 15,
+      "kills": 4,
+      "deaths": 3,
+      "assists": 5,
+      "cs": 188,
+      "ouro": 1149,
+      "morto": false
+    },
+    {
+      "t": 1455,
+      "nivel": 16,
+      "kills": 4,
+      "deaths": 3,
+      "assists": 5,
+      "cs": 191,
+      "ouro": 1254,
+      "morto": false
+    },
+    {
+      "t": 1476,
+      "nivel": 16,
+      "kills": 4,
+      "deaths": 3,
+      "assists": 6,
+      "cs": 194,
+      "ouro": 1504,
+      "morto": false
+    },
+    {
+      "t": 1496,
+      "nivel": 16,
+      "kills": 5,
+      "deaths": 3,
+      "assists": 6,
+      "cs": 197,
+      "ouro": 1910,
+      "morto": false
+    },
+    {
+      "t": 1516,
+      "nivel": 16,
+      "kills": 5,
+      "deaths": 3,
+      "assists": 6,
+      "cs": 199,
+      "ouro": 2010,
+      "morto": false
+    },
+    {
+      "t": 1537,
+      "nivel": 16,
+      "kills": 5,
+      "deaths": 3,
+      "assists": 6,
+      "cs": 202,
+      "ouro": 2115,
+      "morto": false
+    },
+    {
+      "t": 1558,
+      "nivel": 16,
+      "kills": 5,
+      "deaths": 3,
+      "assists": 6,
+      "cs": 205,
+      "ouro": 2215,
+      "morto": false
+    },
+    {
+      "t": 1578,
+      "nivel": 16,
+      "kills": 5,
+      "deaths": 3,
+      "assists": 6,
+      "cs": 208,
+      "ouro": 2320,
+      "morto": false
+    },
+    {
+      "t": 1599,
+      "nivel": 16,
+      "kills": 5,
+      "deaths": 3,
+      "assists": 6,
+      "cs": 210,
+      "ouro": 2421,
+      "morto": false
+    },
+    {
+      "t": 1619,
+      "nivel": 16,
+      "kills": 6,
+      "deaths": 3,
+      "assists": 7,
+      "cs": 213,
+      "ouro": 2976,
+      "morto": false
+    },
+    {
+      "t": 1640,
+      "nivel": 17,
+      "kills": 6,
+      "deaths": 3,
+      "assists": 8,
+      "cs": 216,
+      "ouro": 3226,
+      "morto": false
+    },
+    {
+      "t": 1660,
+      "nivel": 17,
+      "kills": 7,
+      "deaths": 3,
+      "assists": 8,
+      "cs": 219,
+      "ouro": 1331,
+      "morto": false
+    },
+    {
+      "t": 1681,
+      "nivel": 17,
+      "kills": 7,
+      "deaths": 3,
+      "assists": 9,
+      "cs": 222,
+      "ouro": 1582,
+      "morto": false
+    },
+    {
+      "t": 1694,
+      "nivel": 17,
+      "kills": 7,
+      "deaths": 3,
+      "assists": 9,
+      "cs": 223,
+      "ouro": 1652,
+      "morto": false
+    }
+  ],
+  "eventos": [
+    {
+      "t": 194,
+      "tipo": "assistencia"
+    },
+    {
+      "t": 312,
+      "tipo": "abate",
+      "vitima": "Zed"
+    },
+    {
+      "t": 410,
+      "tipo": "nivel",
+      "nivel": 6
+    },
+    {
+      "t": 410,
+      "tipo": "objetivo",
+      "objetivo": "dragao",
+      "lado": "aliado",
+      "dragao": "Fire"
+    },
+    {
+      "t": 520,
+      "tipo": "morte",
+      "por": "Kha'Zix"
+    },
+    {
+      "t": 563,
+      "tipo": "item",
+      "item": "Companheiro de Luden"
+    },
+    {
+      "t": 645,
+      "tipo": "assistencia"
+    },
+    {
+      "t": 655,
+      "tipo": "objetivo",
+      "objetivo": "torre",
+      "lado": "aliado"
+    },
+    {
+      "t": 700,
+      "tipo": "abate",
+      "vitima": "Caitlyn"
+    },
+    {
+      "t": 761,
+      "tipo": "objetivo",
+      "objetivo": "arauto",
+      "lado": "inimigo"
+    },
+    {
+      "t": 830,
+      "tipo": "objetivo",
+      "objetivo": "torre",
+      "lado": "inimigo"
+    },
+    {
+      "t": 841,
+      "tipo": "nivel",
+      "nivel": 11
+    },
+    {
+      "t": 905,
+      "tipo": "morte",
+      "por": "Zed"
+    },
+    {
+      "t": 1010,
+      "tipo": "objetivo",
+      "objetivo": "dragao",
+      "lado": "aliado",
+      "dragao": "Earth"
+    },
+    {
+      "t": 1080,
+      "tipo": "abate",
+      "vitima": "Lux"
+    },
+    {
+      "t": 1096,
+      "tipo": "assistencia"
+    },
+    {
+      "t": 1150,
+      "tipo": "abate",
+      "vitima": "Zed"
+    },
+    {
+      "t": 1157,
+      "tipo": "item",
+      "item": "Chama Sombria"
+    },
+    {
+      "t": 1189,
+      "tipo": "assistencia"
+    },
+    {
+      "t": 1206,
+      "tipo": "objetivo",
+      "objetivo": "torre",
+      "lado": "aliado"
+    },
+    {
+      "t": 1264,
+      "tipo": "assistencia"
+    },
+    {
+      "t": 1290,
+      "tipo": "objetivo",
+      "objetivo": "barao",
+      "lado": "aliado"
+    },
+    {
+      "t": 1340,
+      "tipo": "morte",
+      "por": "Caitlyn"
+    },
+    {
+      "t": 1421,
+      "tipo": "objetivo",
+      "objetivo": "inibidor",
+      "lado": "aliado"
+    },
+    {
+      "t": 1455,
+      "tipo": "nivel",
+      "nivel": 16
+    },
+    {
+      "t": 1465,
+      "tipo": "assistencia"
+    },
+    {
+      "t": 1480,
+      "tipo": "abate",
+      "vitima": "Caitlyn"
+    },
+    {
+      "t": 1530,
+      "tipo": "objetivo",
+      "objetivo": "dragao",
+      "lado": "inimigo",
+      "dragao": "Hextech"
+    },
+    {
+      "t": 1600,
+      "tipo": "abate",
+      "vitima": "Kha'Zix"
+    },
+    {
+      "t": 1619,
+      "tipo": "assistencia"
+    },
+    {
+      "t": 1640,
+      "tipo": "assistencia"
+    },
+    {
+      "t": 1650,
+      "tipo": "abate",
+      "vitima": "Zed"
+    },
+    {
+      "t": 1660,
+      "tipo": "item",
+      "item": "Capuz da Morte de Rabadon"
+    },
+    {
+      "t": 1670,
+      "tipo": "assistencia"
+    }
+  ],
+  "falas": [
+    {
+      "t": 102,
+      "texto": "Nível novo: com a ult disponível, você ganha a troca se o Zed gastar a sombra primeiro.",
+      "evento": "level_up"
+    },
+    {
+      "t": 461,
+      "texto": "Dragão garantido. Empurra a lane mais próxima antes de recuar.",
+      "evento": "event:6"
+    },
+    {
+      "t": 522,
+      "texto": "O Kha'Zix te pegou sem ninguém por perto. Antes de entrar no rio, espera o Lee Sin ou coloca um sentinela.",
+      "evento": "death"
+    },
+    {
+      "t": 882,
+      "texto": "Torre caiu. Gira para a lane do lado para não deixar a vantagem parada.",
+      "evento": "event:13"
+    },
+    {
+      "t": 912,
+      "texto": "O Zed já tinha dois abates e você estava longe da torre. Joga mais recuado até a ult dele sair.",
+      "evento": "death"
+    },
+    {
+      "t": 1260,
+      "texto": "Vale, mas empurra a wave do meio primeiro e chega no rio junto com o Lee Sin.",
+      "pergunta": "vale a pena fazer o barão agora?"
+    },
+    {
+      "t": 1264,
+      "texto": "Arauto para eles. Segura a wave perto da sua torre até ele ser usado.",
+      "evento": "event:15"
+    },
+    {
+      "t": 1343,
+      "texto": "A Caitlyn estava à frente no ouro. Na próxima luta, fica atrás do Ornn e entra depois que ela gastar o flash.",
+      "evento": "death"
+    }
+  ],
+  "numeros": {
+    "kills": 7,
+    "deaths": 3,
+    "assists": 9,
+    "kda": 5.33,
+    "abates_do_time": 25,
+    "participacao": 0.64,
+    "cs": 223,
+    "cs_por_min": 7.9,
+    "cs_aos_10": 66,
+    "nivel": 17,
+    "visao": 21,
+    "itens": [
+      "Companheiro de Luden",
+      "Chama Sombria",
+      "Capuz da Morte de Rabadon"
+    ],
+    "ouro_parado_seg": 174
+  },
+  "analise": {
+    "fortes": [
+      "Farm consistente: 7,9 de CS por minuto e 66 aos 10 minutos. Continue pegando as waves entre as lutas.",
+      "Você participou de 64% dos abates do time (16 de 25). Continue lutando perto do seu jungle."
+    ],
+    "treinar": [
+      "Foram 3 mortes, para Kha'Zix, Zed e Caitlyn (08:40, 15:05 e 22:20). Antes de avançar, espere o jungle ou coloque um sentinela.",
+      "Você ficou cerca de 3 minutos com 1.800 de ouro ou mais sem gastar. Quando passar disso, dê base e transforme o ouro em item."
+    ]
+  }
+}

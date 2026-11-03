@@ -47,6 +47,15 @@ class RuntimeSettingsTests(unittest.TestCase):
         self.assertEqual(settings["max_history_messages"], 12)
         self.assertEqual(settings["default_personality"], "1")
         self.assertTrue(settings["overlay_enabled"])
+        self.assertTrue(settings["post_match_report"])
+        self.assertTrue(settings["post_match_open"])
+
+    def test_post_match_settings_can_be_disabled(self):
+        with patch.dict(os.environ, {"POST_MATCH_REPORT": "false", "POST_MATCH_OPEN": "0"}, clear=True):
+            settings = get_runtime_settings()
+
+        self.assertFalse(settings["post_match_report"])
+        self.assertFalse(settings["post_match_open"])
 
     def test_env_values_override_defaults(self):
         env = {

@@ -14,7 +14,9 @@ from coach_engine import ConnectionGracePeriod, GameAnalyzer
 from coach_worker import CoachJob, CoachWorker
 from config import APP_DIR, APP_VERSION, get_runtime_settings, load_profile
 from live_client import get_game_data, summarize_game_data
+from match_recorder import MatchRecorder
 from overlay import CoachOverlay
+from post_match_report import ReportWriter
 from voice import Voice, listen_and_transcribe
 
 load_dotenv(APP_DIR / ".env")
@@ -59,6 +61,13 @@ def main():
     analyzer = GameAnalyzer()
     coach_worker = CoachWorker()
     connection_grace = ConnectionGracePeriod()
+    personality_name = PERSONALIDADES.get(personality_id, PERSONALIDADES["1"])["nome"]
+    recorder = MatchRecorder()
+    reports = ReportWriter(
+        APP_DIR / "partidas",
+        enabled=RUNTIME_SETTINGS["post_match_report"],
+        open_browser=RUNTIME_SETTINGS["post_match_open"],
+    )
     history = []
     last_check = 0.0
     last_game_token = None
@@ -97,6 +106,12 @@ def main():
                     if reply:
                         overlay.show_tip(reply)
                         voice.speak(reply, priority=job.priority)
+                        recorder.record_tip(
+                            (job.game_summary or {}).get("tempo_de_jogo_seg"),
+                            reply,
+                            question=job.user_text if job.kind == "chat" else None,
+                            event_kind=job.event_kind,
+                        )
 
             if keyboard.is_pressed(PUSH_TO_TALK_KEY):
                 text = listen_and_transcribe(PUSH_TO_TALK_KEY)
@@ -120,6 +135,7 @@ def main():
                     if last_in_game:
                         if connection_grace.update(False):
                             print("🏁 Partida encerrada ou cliente indisponível.")
+                            reports.submit(recorder.finish(), personality_id, profile)
                             last_in_game = False
                             last_game_token = None
                             last_game_time = None
@@ -146,11 +162,15 @@ def main():
                     token = _session_token(summary)
                     game_time = summary["tempo_de_jogo_seg"]
                     if token != last_game_token or (last_game_time is not None and game_time < last_game_time - 5):
+                        # Uma partida nova sem passar pelo fim (ex.: relógio voltou) fecha o resumo da anterior.
+                        reports.submit(recorder.finish(), personality_id, profile)
                         analyzer.reset()
                         coach_worker.reset()
                         history.clear()
                         last_game_token = token
+                        recorder.start(summary, personality_name)
                         print(f"🎮 Partida detectada: {summary['eu']['campeao']}")
+                    recorder.update(summary)
                     last_game_time = game_time
                     last_in_game = True
                     overlay.set_status(f"● {summary['eu']['campeao']} · {summary['tempo_de_jogo_min']:.1f} min")
@@ -170,6 +190,9 @@ def main():
             time.sleep(0.05)
         except KeyboardInterrupt:
             print("\nEncerrando o LoL AI Coach. Boa partida!")
+            # Fechar no meio da partida salva um resumo parcial, sem esperar pela IA.
+            reports.write_partial(recorder.finish(partial=True))
+            reports.wait(timeout=5)
             coach_worker.shutdown()
             sys.exit(0)
 
