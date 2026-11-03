@@ -92,7 +92,6 @@ def get_game_data() -> dict | None:
 
 def _player_entry(player: dict) -> dict:
     scores = player.get("scores", {}) or {}
-    stats = player.get("championStats", {}) or {}
     items = [
         item.get("displayName")
         for item in player.get("items", []) or []
@@ -110,8 +109,6 @@ def _player_entry(player: dict) -> dict:
         "cs": scores.get("creepScore", 0),
         "morto_agora": bool(player.get("isDead", False)),
         "itens": items,
-        "vida": round(stats.get("currentHealth", 0)),
-        "vida_maxima": round(stats.get("maxHealth", 0)),
     }
 
 
@@ -132,6 +129,11 @@ def summarize_game_data(data: dict | None) -> dict | None:
     # the local player when the active player has not been identified yet.
     if me is not None:
         me["gold_atual"] = round(float(active_player.get("currentGold", 0) or 0))
+        # A vida só existe em activePlayer.championStats: as entradas de
+        # allPlayers não trazem championStats.
+        stats = active_player.get("championStats") or {}
+        me["vida"] = round(float(stats.get("currentHealth", 0) or 0))
+        me["vida_maxima"] = round(float(stats.get("maxHealth", 0) or 0))
     my_team = me.get("time") if me else None
 
     game_time = float(game_data.get("gameTime", 0) or 0)
