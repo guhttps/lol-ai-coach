@@ -1,0 +1,22 @@
+name: Sugerir uma ideia
+description: Uma melhoria ou recurso novo para o coach.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Que problema isso resolve?
+      description: Conte a situação de jogo ou de uso em que você sentiu falta disso.
+      placeholder: Quando eu morro várias vezes seguidas, o coach...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Como você imagina a solução?
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas que você considerou
