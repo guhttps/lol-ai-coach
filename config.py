@@ -8,7 +8,7 @@ from pathlib import Path
 
 APP_VERSION = "3.2.0"
 
-APP_DIR =Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
+APP_DIR = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
 
 DEFAULT_PROFILE = {
     "nome": "Minha jogadora",
