@@ -42,6 +42,10 @@ GLOBAL_COOLDOWN_SECONDS = 35.0
 # morte é informação de segurança, não deve esperar fila).
 CRITICAL_PRIORITY = 95
 
+# Ouro não gasto a partir do qual vale lembrar de resetar. O resumo
+# pós-partida usa o mesmo limite para medir o tempo com ouro parado.
+RICH_GOLD_THRESHOLD = 1800
+
 
 class GameAnalyzer:
     def __init__(self):
@@ -90,7 +94,7 @@ class GameAnalyzer:
             add("respawn", 55, "A jogadora voltou à vida. Diga qual deve ser a prioridade imediata com base no estado atual.", 35)
 
         gold = me.get("gold_atual", 0) or 0
-        if gold >= 1800 and gold > (prev.get("eu", {}).get("gold_atual", 0) or 0) + 500:
+        if gold >= RICH_GOLD_THRESHOLD and gold >(prev.get("eu", {}).get("gold_atual", 0) or 0) + 500:
             add("rich", 65, "A jogadora acumulou bastante ouro. Oriente se vale a pena resetar e comprar, sem inventar itens específicos.", 120)
 
         if me.get("nivel", 0) > prev.get("eu", {}).get("nivel", 0):

@@ -107,6 +107,7 @@ def _player_entry(player: dict) -> dict:
         "deaths": scores.get("deaths", 0),
         "assists": scores.get("assists", 0),
         "cs": scores.get("creepScore", 0),
+        "visao": round(float(scores.get("wardScore", 0) or 0)),
         "morto_agora": bool(player.get("isDead", False)),
         "itens": items,
     }
@@ -168,8 +169,11 @@ def summarize_game_data(data: dict | None) -> dict | None:
             "assassino": event.get("KillerName"),
             "vitima": event.get("VictimName"),
             "torre": event.get("TurretKilled"),
+            "inibidor": event.get("InhibKilled"),
             "dragao": event.get("DragonType"),
             "time": event.get("Team"),
+            # GameEnd costuma trazer "Win"/"Lose", mas o campo não é documentado.
+            "resultado": event.get("Result"),
         }
         summary["eventos_recentes"].append({k: v for k, v in clean.items() if v is not None})
 

@@ -99,6 +99,22 @@ class SummarizeGameDataTests(unittest.TestCase):
 
         self.assertEqual([trigger.kind for trigger in triggers], ["low_health"])
 
+    def test_vision_score_and_post_match_event_fields_are_kept(self):
+        data = payload_with_health(600)
+        data["allPlayers"][0]["scores"]["wardScore"] = 12.6
+        data["events"]["Events"] = [
+            {"EventID": 1, "EventName": "InhibKilled", "EventTime": 1500.2,
+             "InhibKilled": "Barracks_T2_R1", "KillerName": "Aliado"},
+            {"EventID": 2, "EventName": "GameEnd", "EventTime": 1700.0, "Result": "Win"},
+        ]
+
+        with patch("live_client.is_finished_item", return_value=None):
+            summary = summarize_game_data(data)
+
+        self.assertEqual(summary["eu"]["visao"], 13)
+        self.assertEqual(summary["eventos_recentes"][0]["inibidor"], "Barracks_T2_R1")
+        self.assertEqual(summary["eventos_recentes"][1]["resultado"], "Win")
+
     def test_empty_payload_returns_none(self):
         self.assertIsNone(summarize_game_data(None))
 
