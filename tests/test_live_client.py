@@ -4,19 +4,32 @@ from unittest.mock import patch
 import requests
 
 import live_client
+from coach_engine import GameAnalyzer
 from live_client import summarize_game_data
 
 
 def player(name, champion, team):
+    # Mesmo formato da Live Client API: entradas de allPlayers não têm championStats.
     return {
         "riotIdGameName": name,
         "summonerName": name,
         "championName": champion,
         "team": team,
         "level": 1,
-        "scores": {"kills": 0, "deaths": 0, "assists": 0, "creepScore": 0},
-        "championStats": {"currentHealth": 500, "maxHealth": 500},
+        "scores": {"kills": 0, "deaths": 0, "assists": 0, "creepScore": 0, "wardScore": 0.0},
         "items": [],
+    }
+
+
+def payload_with_health(current_health, max_health=600):
+    return {
+        "allPlayers": [player("MinhaConta", "Ahri", "ORDER"), player("Aliado", "Lux", "ORDER")],
+        "activePlayer": {
+            "riotIdGameName": "MinhaConta",
+            "championStats": {"currentHealth": current_health, "maxHealth": max_health},
+        },
+        "gameData": {"gameTime": 300},
+        "events": {"Events": []},
     }
 
 
@@ -66,6 +79,41 @@ class SummarizeGameDataTests(unittest.TestCase):
         self.assertIsNone(summary["eu"])
         self.assertEqual(summary["aliados"], [])
         self.assertEqual(summary["inimigos"], [])
+
+    def test_health_comes_from_active_player_stats(self):
+        with patch("live_client.is_finished_item", return_value=None):
+            summary = summarize_game_data(payload_with_health(120.6))
+
+        self.assertEqual(summary["eu"]["vida"], 121)
+        self.assertEqual(summary["eu"]["vida_maxima"], 600)
+        self.assertNotIn("vida", summary["aliados"][0])
+
+    def test_low_health_trigger_fires_with_real_payload_shape(self):
+        # Regressão: a vida era lida de allPlayers, que não tem championStats,
+        # e o aviso de vida baixa nunca disparava.
+        analyzer = GameAnalyzer()
+        with patch("live_client.is_finished_item", return_value=None), \
+                patch("coach_engine.time.time", return_value=100):
+            analyzer.analyze(summarize_game_data(payload_with_health(600)))
+            triggers = analyzer.analyze(summarize_game_data(payload_with_health(90)))
+
+        self.assertEqual([trigger.kind for trigger in triggers], ["low_health"])
+
+    def test_vision_score_and_post_match_event_fields_are_kept(self):
+        data = payload_with_health(600)
+        data["allPlayers"][0]["scores"]["wardScore"] = 12.6
+        data["events"]["Events"] = [
+            {"EventID": 1, "EventName": "InhibKilled", "EventTime": 1500.2,
+             "InhibKilled": "Barracks_T2_R1", "KillerName": "Aliado"},
+            {"EventID": 2, "EventName": "GameEnd", "EventTime": 1700.0, "Result": "Win"},
+        ]
+
+        with patch("live_client.is_finished_item", return_value=None):
+            summary = summarize_game_data(data)
+
+        self.assertEqual(summary["eu"]["visao"], 13)
+        self.assertEqual(summary["eventos_recentes"][0]["inibidor"], "Barracks_T2_R1")
+        self.assertEqual(summary["eventos_recentes"][1]["resultado"], "Win")
 
     def test_empty_payload_returns_none(self):
         self.assertIsNone(summarize_game_data(None))

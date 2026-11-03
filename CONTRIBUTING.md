@@ -32,6 +32,12 @@ Os testes não chamam serviços reais: Groq, Data Dragon, Live Client API e o lo
 
 Mudanças no loop principal, na voz ou no overlay também merecem um teste em uma partida real (uma partida contra bots já serve).
 
+Para mexer no visual do resumo pós-partida sem jogar, gere a página de exemplo a partir de `tests/fixtures/sample_match.json`:
+
+```powershell
+python scripts/sample_report.py   # cria dist/resumo-exemplo.html
+```
+
 ## Onde mexer
 
 | Quero mudar... | Arquivo |
@@ -41,6 +47,8 @@ Mudanças no loop principal, na voz ou no overlay também merecem um teste em um
 | Os dados lidos da partida | `live_client.py` |
 | Voz, transcrição e dicionário de termos de LoL | `voice.py` |
 | A janela do overlay | `overlay.py` |
+| O que o resumo pós-partida registra | `match_recorder.py` |
+| A página do resumo e a análise final | `post_match_report.py` (regras da análise em `brain.py`) |
 | Variáveis do `.env` e perfil | `config.py` |
 
 ## Convenções

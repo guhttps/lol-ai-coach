@@ -16,6 +16,9 @@ dist/
 # Arquivos temporários do projeto
 temp_voice_resp.mp3
 
+# Resumos pós-partida (dados das suas partidas)
+partidas/
+
 # Perfil pessoal (descomente se não quiser publicar o seu)
 # player_profile.json
 

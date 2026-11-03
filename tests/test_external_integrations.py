@@ -136,6 +136,55 @@ class GroqIntegrationTests(unittest.TestCase):
         self.assertEqual(call.call_args.args[1], "example-model")
 
 
+class PostMatchReviewTests(unittest.TestCase):
+    def setUp(self):
+        self.working_model = patch.object(brain, "_working_model", None)
+        self.working_model.start()
+        self.addCleanup(self.working_model.stop)
+
+    def _review(self, response):
+        with patch.dict("os.environ", {"GROQ_API_KEY": "test-key"}, clear=True):
+            with patch("brain._call_api", return_value=response) as call:
+                result = brain.ask_post_match_review({"campeao": "Ahri"}, "2", {"nome": "Teste"})
+        return result, call
+
+    @staticmethod
+    def _reply(content):
+        return GroqIntegrationTests._response(200, {"choices": [{"message": {"content": content}}]})
+
+    def test_review_is_split_into_strengths_and_points_to_train(self):
+        result, call = self._review(self._reply(
+            "+ Farm consistente, 7,5 por minuto.\n+ Participou de 64% dos abates.\n"
+            "- Três mortes sem visão: coloque sentinelas.\n- Gaste o ouro antes de 1.800."
+        ))
+
+        self.assertEqual(result["fortes"], ["Farm consistente, 7,5 por minuto.", "Participou de 64% dos abates."])
+        self.assertEqual(len(result["treinar"]), 2)
+        self.assertEqual(call.call_args.kwargs["max_tokens"], brain.REVIEW_MAX_TOKENS)
+        system_prompt, user_message = (message["content"] for message in call.call_args.args[2])
+        self.assertIn("2 pontos fortes e 2 pontos a treinar", system_prompt)
+        self.assertIn(brain.PERSONALIDADES["2"]["prompt"], system_prompt)
+        self.assertIn('"campeao":"Ahri"', user_message)
+
+    def test_unexpected_review_format_is_reported(self):
+        with self.assertRaisesRegex(RuntimeError, "formato inesperado"):
+            self._review(self._reply("Foi uma boa partida."))
+
+    def test_review_api_errors_are_reported(self):
+        with self.assertRaisesRegex(RuntimeError, "limite da API"):
+            self._review(GroqIntegrationTests._response(429))
+
+    def test_parse_review_accepts_dashes_and_keeps_two_points_each(self):
+        review = brain.parse_review("Análise:\n+ a\n— b\n– c\n+ d\n+ e\n- f")
+        self.assertEqual(review, {"fortes": ["a", "d"], "treinar": ["b", "c"]})
+
+    def test_tips_keep_the_short_token_limit(self):
+        with patch.dict("os.environ", {"GROQ_API_KEY": "test-key"}, clear=True):
+            with patch("brain._call_api", return_value=self._reply("Dica útil.")) as call:
+                brain.ask_coach("oi", None, [])
+        self.assertEqual(call.call_args.kwargs["max_tokens"], brain.TIP_MAX_TOKENS)
+
+
 class ItemDataTests(unittest.TestCase):
     def setUp(self):
         self.finished_ids = patch.object(item_data, "_finished_item_ids", None)

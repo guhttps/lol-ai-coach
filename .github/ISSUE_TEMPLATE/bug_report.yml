@@ -40,7 +40,7 @@ body:
     attributes:
       label: Versão do coach
       description: Aparece na primeira linha do terminal (=== LoL AI Coach vX.Y.Z ===).
-      placeholder: "3.2.0"
+      placeholder: "3.3.0"
     validations:
       required: true
 
