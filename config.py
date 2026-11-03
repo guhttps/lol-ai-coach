@@ -6,6 +6,7 @@ import sys
 from copy import deepcopy
 from pathlib import Path
 
+APP_VERSION = "3.2.0"
 
 APP_DIR = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
 
@@ -54,7 +55,7 @@ def load_profile(path=None):
     if not os.path.exists(path):
         return deepcopy(DEFAULT_PROFILE)
     try:
-        with open(path, "r", encoding="utf-8") as file:
+        with open(path, encoding="utf-8") as file:
             data = json.load(file)
         if not isinstance(data, dict):
             return deepcopy(DEFAULT_PROFILE)

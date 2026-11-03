@@ -1,0 +1,8 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+# Erros reais, imports organizados, bugs comuns e sintaxe moderna.
+# E501 (linha longa) fica de fora: os prompts do coach são textos longos.
+select = ["E4", "E7", "E9", "F", "W", "I", "B", "UP"]

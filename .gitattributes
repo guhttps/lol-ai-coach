@@ -1,0 +1,7 @@
+* text=auto
+
+# O cmd.exe espera CRLF em scripts .bat
+*.bat text eol=crlf
+
+*.png binary
+*.ico binary

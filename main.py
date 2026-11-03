@@ -1,9 +1,8 @@
-"""LoL AI Coach v3.1 — voz, análise proativa, memória de sessão e overlay."""
+"""LoL AI Coach — voz, análise proativa, memória de sessão e overlay."""
 
 from __future__ import annotations
 
 import logging
-import os
 import sys
 import time
 
@@ -13,7 +12,7 @@ from dotenv import load_dotenv
 from brain import PERSONALIDADES
 from coach_engine import ConnectionGracePeriod, GameAnalyzer
 from coach_worker import CoachJob, CoachWorker
-from config import APP_DIR, get_runtime_settings, load_profile
+from config import APP_DIR, APP_VERSION, get_runtime_settings, load_profile
 from live_client import get_game_data, summarize_game_data
 from overlay import CoachOverlay
 from voice import Voice, listen_and_transcribe
@@ -41,9 +40,18 @@ def _session_token(summary):
     return f"{summary.get('mapa')}:{summary['eu'].get('nome')}:{summary['eu'].get('campeao')}"
 
 
+def _configure_console():
+    # Com a saída redirecionada (ex.: "> log.txt"), o Windows usa cp1252 e os
+    # emojis dos logs derrubariam o coach. UTF-8 funciona no console e em arquivo,
+    # e o buffer por linha mantém o log atualizado durante a partida.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
+
+
 def main():
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    print("=== LoL AI Coach v3.1 ===")
+    print(f"=== LoL AI Coach v{APP_VERSION} ===")
     personality_id = escolher_personalidade()
     profile = load_profile()
     overlay = CoachOverlay(enabled=RUNTIME_SETTINGS["overlay_enabled"])
@@ -167,4 +175,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _configure_console()
     main()

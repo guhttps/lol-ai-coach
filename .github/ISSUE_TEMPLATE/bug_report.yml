@@ -1,0 +1,79 @@
+name: Relatar um bug
+description: Algo não funciona como deveria.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por relatar! Antes de enviar, confira a seção [Solução de problemas](https://github.com/guhttps/lol-ai-coach#solução-de-problemas) do README.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: O que aconteceu?
+      description: Descreva o problema e o que você esperava que acontecesse.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Como reproduzir
+      placeholder: |
+        1. Abri o coach com a personalidade 2
+        2. Entrei em uma partida contra bots
+        3. Segurei ESPAÇO e perguntei...
+
+  - type: dropdown
+    id: launch
+    attributes:
+      label: Como você abre o coach?
+      options:
+        - Executável da release (LoL_AI_Coach.exe)
+        - start_coach.bat
+        - python main.py
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Versão do coach
+      description: Aparece na primeira linha do terminal (=== LoL AI Coach vX.Y.Z ===).
+      placeholder: "3.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Provedor de IA
+      options:
+        - Groq (padrão)
+        - OpenAI
+        - OpenRouter
+        - Ollama
+        - Outro
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Versão do Windows
+      placeholder: Windows 11 24H2
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log do terminal
+      description: Cole as mensagens do terminal. **Apague sua chave de API se ela aparecer.**
+      render: text
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacidade
+      options:
+        - label: Confirmo que não há chaves de API nem dados pessoais no que enviei.
+          required: true

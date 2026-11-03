@@ -1,3 +1,5 @@
+import io
+import sys
 import unittest
 from contextlib import ExitStack
 from unittest.mock import Mock, patch
@@ -38,3 +40,14 @@ class SessionTests(unittest.TestCase):
         self.assertEqual(worker.reset.call_count, 2)
         self.assertEqual(analyzer.reset.call_count, 2)
         worker.shutdown.assert_called_once()
+
+
+class ConsoleTests(unittest.TestCase):
+    def test_redirected_cp1252_output_accepts_emoji_logs(self):
+        buffer = io.BytesIO()
+        stream = io.TextIOWrapper(buffer, encoding="cp1252")
+        with patch.object(sys, "stdout", stream), patch.object(sys, "stderr", stream):
+            main._configure_console()
+            print("🎙️ Segure [SPACE] para falar.", file=stream)
+        stream.flush()
+        self.assertIn("🎙️".encode(), buffer.getvalue())
